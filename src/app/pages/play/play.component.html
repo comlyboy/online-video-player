@@ -1,0 +1,228 @@
+<header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+
+	<div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+
+		<a href="#" class="flex items-center gap-3">
+
+			<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500 font-bold text-slate-950">
+				▶
+			</div>
+
+			<div>
+
+				<h1 class="font-bold">
+					Online Video Player
+				</h1>
+
+				<p class="text-xs text-slate-500">
+					Stream from URL
+				</p>
+
+			</div>
+
+		</a>
+
+		<button class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-cyan-500 hover:text-cyan-400">
+			Home
+		</button>
+
+	</div>
+
+</header>
+
+<main class="mx-auto max-w-7xl px-6 py-10">
+
+	<div class="grid gap-8 lg:grid-cols-[1fr_340px]">
+
+		<!-- LEFT -->
+
+		<section>
+
+			<!-- URL Input -->
+
+			<div class="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+
+				<label class="mb-3 block text-sm font-medium text-slate-300">
+
+					Video URL
+
+				</label>
+
+				<div class="flex flex-col gap-3 md:flex-row">
+
+					<input type="url" placeholder="https://example.com/video.mp4"
+						class="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-5 py-4 outline-none transition focus:border-cyan-500">
+
+					<button class="rounded-xl bg-cyan-500 px-8 py-4 font-semibold text-slate-950 transition hover:bg-cyan-400">
+
+						▶ Play
+
+					</button>
+
+
+
+				</div>
+
+			</div>
+
+			<div class="mt-6 overflow-hidden rounded-2xl border border-slate-800 bg-black shadow-2xl">
+
+
+
+			</div>
+			<app-video-player
+				url="https://web.wootly.ch/source?id=e635bb458f0d866fdef2a4d6fbae5752ef9fc75a&sig=H2MirhMSQTVdaBJCc7HlXA&expire=1783180417&ofs=11&usr=77043" />
+
+			<!-- Information -->
+
+			<div class="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+
+				<h2 class="text-xl font-semibold">
+
+					About This Video
+
+				</h2>
+
+				<div class="mt-4 grid gap-4 sm:grid-cols-2">
+
+					<div>
+
+						<p class="text-sm text-slate-500">
+
+							Source
+
+						</p>
+
+						<p class="mt-1 truncate text-slate-300">
+
+							—
+
+						</p>
+
+					</div>
+
+					<div>
+
+						<p class="text-sm text-slate-500">
+
+							Format
+
+						</p>
+
+						<p class="mt-1">
+
+							MP4
+
+						</p>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</section>
+
+		<!-- SIDEBAR -->
+
+		<aside class="space-y-6">
+
+			<!-- Supported -->
+
+			<div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+
+				<h3 class="font-semibold">
+
+					Supported Formats
+
+				</h3>
+
+				<div class="mt-5 space-y-3">
+
+					<div class="flex items-center justify-between">
+						<span>MP4</span>
+						<span class="text-green-400">✓</span>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<span>WebM</span>
+						<span class="text-green-400">✓</span>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<span>Ogg</span>
+						<span class="text-green-400">✓</span>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<span>HLS</span>
+						<span class="text-yellow-400">Plugin</span>
+					</div>
+
+					<div class="flex items-center justify-between">
+						<span>MPEG-DASH</span>
+						<span class="text-yellow-400">Plugin</span>
+					</div>
+
+				</div>
+
+			</div>
+
+			<!-- Tips -->
+
+			<div class="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-6">
+
+				<h3 class="font-semibold text-cyan-300">
+
+					Tips
+
+				</h3>
+
+				<ul class="mt-4 space-y-3 text-sm text-slate-300">
+
+					<li>• Use publicly accessible video URLs.</li>
+
+					<li>• Direct media files work best.</li>
+
+					<li>• YouTube page links are not supported.</li>
+
+					<li>• Videos remain hosted on their original server.</li>
+
+				</ul>
+
+			</div>
+
+			<!-- Example -->
+
+			<div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+
+				<h3 class="font-semibold">
+
+					Example URL
+
+				</h3>
+
+				<div class="mt-4 overflow-hidden rounded-lg bg-slate-950 p-4">
+
+					<code class="text-sm text-cyan-400 break-all">
+
+	https://example.com/video.mp4
+
+	                        </code>
+
+				</div>
+
+				<button
+					class="mt-5 w-full rounded-lg border border-slate-700 py-3 transition hover:border-cyan-500 hover:text-cyan-400">
+
+					Copy Example
+
+				</button>
+
+			</div>
+
+		</aside>
+
+	</div>
+
+</main>
