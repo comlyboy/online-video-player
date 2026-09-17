@@ -2,14 +2,17 @@
 
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { BottomControlBarComponent } from "@/components/BottomControlBarComponent";
+import { ControlDrawerComponent } from "@/components/ControlDrawerComponent";
+import { ControlDrawerTriggerComponent } from "@/components/ControlDrawerTriggerComponent";
 import { PlatformFrameComponent } from "@/components/PlatformFrameComponent";
-import { TopBarComponent } from "@/components/TopBarComponent";
 import { WelcomeScreenComponent } from "@/components/WelcomeScreenComponent";
 import { streamingPlatforms } from "@/data/streaming-platforms";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
+import { useControlDrawerStore } from "@/store/control-drawer-store";
+import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
+import { useWatchHistoryStore } from "@/store/watch-history-store";
 
 const VideoPlayerComponent = dynamic(
   () => import("@/components/VideoPlayerComponent").then((videoPlayerModule) => videoPlayerModule.VideoPlayerComponent),
@@ -26,8 +29,20 @@ export function WatchAppComponent() {
   const [activeTabId, setActiveTabId] = useState(requestedTabId);
   const [activeVideoUrl, setActiveVideoUrl] = useState(requestedVideoUrl);
 
+  const customSites = useCustomStreamingSitesStore((state) => state.customSites);
+  const loadCustomSites = useCustomStreamingSitesStore((state) => state.loadCustomSites);
+  const loadWatchHistory = useWatchHistoryStore((state) => state.loadHistory);
+  const recordWatchedVideoUrl = useWatchHistoryStore((state) => state.recordVideo);
+  const closeDrawer = useControlDrawerStore((state) => state.close);
+
+  useEffect(() => {
+    loadCustomSites();
+    loadWatchHistory();
+  }, [loadCustomSites, loadWatchHistory]);
+
   function selectTab(tabId: string) {
     setActiveTabId(tabId);
+    closeDrawer();
 
     if (tabId === CUSTOM_URL_TAB_ID && activeVideoUrl) {
       router.replace(`/?tab=${tabId}&url=${encodeURIComponent(activeVideoUrl)}`);
@@ -38,20 +53,22 @@ export function WatchAppComponent() {
 
   function goToWelcome() {
     setActiveTabId("");
+    closeDrawer();
     router.replace("/");
   }
 
   function handleSubmitVideoUrl(videoUrl: string) {
+    setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
+    recordWatchedVideoUrl(videoUrl);
+    closeDrawer();
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
   }
 
-  const activePlatform = streamingPlatforms.find((platform) => platform.id === activeTabId);
+  const activePlatform = [...streamingPlatforms, ...customSites].find((platform) => platform.id === activeTabId);
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
-      <TopBarComponent onGoToWelcome={goToWelcome} />
-
       <div className="min-h-0 flex-1">
         {activeTabId === "" ? (
           <WelcomeScreenComponent onSelectTab={selectTab} />
@@ -66,15 +83,16 @@ export function WatchAppComponent() {
         )}
       </div>
 
-      {activeTabId !== "" ? (
-        <BottomControlBarComponent
-          activeTabId={activeTabId}
-          onSelectTab={selectTab}
-          activePlatform={activePlatform}
-          activeVideoUrl={activeVideoUrl}
-          onSubmitVideoUrl={handleSubmitVideoUrl}
-        />
-      ) : null}
+      <ControlDrawerTriggerComponent />
+
+      <ControlDrawerComponent
+        activeTabId={activeTabId}
+        onSelectTab={selectTab}
+        activePlatform={activePlatform}
+        activeVideoUrl={activeVideoUrl}
+        onSubmitVideoUrl={handleSubmitVideoUrl}
+        onGoToWelcome={goToWelcome}
+      />
     </div>
   );
 }
