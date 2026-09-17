@@ -1,0 +1,46 @@
+[build]
+  # This repo now holds client/ and server/ side by side; base tells
+  # Netlify which one it's building. publish stays relative to base.
+  base = "client"
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Optional if using App Router with static export
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+[[headers]]
+  # Same values next.config.ts already documents in its commented-out
+  # headers() block — that function doesn't run under `output: "export"`
+  # since there's no server to apply it, so it has to happen here instead.
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  # The exported shell should always be revalidated so a returning visitor
+  # gets the latest build's asset references, not a stale cached index.
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+
+# Next's static-export file convention writes these with no extension, so
+# Netlify can't infer a MIME type and falls back to text/plain — which social
+# crawlers (WhatsApp, Facebook, Twitter) reject outright as "not an image",
+# even though the bytes are a valid PNG. Set the type explicitly.
+[[headers]]
+  for = "/opengraph-image"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/icon"
+  [headers.values]
+    Content-Type = "image/png"

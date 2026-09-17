@@ -10,7 +10,6 @@ import { PlatformFrameComponent } from "@/components/PlatformFrameComponent";
 import { WelcomeScreenComponent } from "@/components/WelcomeScreenComponent";
 import { streamingPlatforms } from "@/data/streaming-platforms";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
-import { useControlDrawerStore } from "@/store/control-drawer-store";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
 
@@ -33,7 +32,6 @@ export function WatchAppComponent() {
   const loadCustomSites = useCustomStreamingSitesStore((state) => state.loadCustomSites);
   const loadWatchHistory = useWatchHistoryStore((state) => state.loadHistory);
   const recordWatchedVideoUrl = useWatchHistoryStore((state) => state.recordVideo);
-  const closeDrawer = useControlDrawerStore((state) => state.close);
 
   useEffect(() => {
     loadCustomSites();
@@ -42,7 +40,6 @@ export function WatchAppComponent() {
 
   function selectTab(tabId: string) {
     setActiveTabId(tabId);
-    closeDrawer();
 
     if (tabId === CUSTOM_URL_TAB_ID && activeVideoUrl) {
       router.replace(`/?tab=${tabId}&url=${encodeURIComponent(activeVideoUrl)}`);
@@ -53,7 +50,6 @@ export function WatchAppComponent() {
 
   function goToWelcome() {
     setActiveTabId("");
-    closeDrawer();
     router.replace("/");
   }
 
@@ -61,19 +57,18 @@ export function WatchAppComponent() {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
     recordWatchedVideoUrl(videoUrl);
-    closeDrawer();
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
   }
 
   const activePlatform = [...streamingPlatforms, ...customSites].find((platform) => platform.id === activeTabId);
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1">
         {activeTabId === "" ? (
           <WelcomeScreenComponent onSelectTab={selectTab} />
         ) : activePlatform ? (
-          <PlatformFrameComponent platform={activePlatform} />
+          <PlatformFrameComponent key={activePlatform.id} platform={activePlatform} />
         ) : activeVideoUrl ? (
           <VideoPlayerComponent key={activeVideoUrl} videoUrl={activeVideoUrl} />
         ) : (
@@ -88,7 +83,6 @@ export function WatchAppComponent() {
       <ControlDrawerComponent
         activeTabId={activeTabId}
         onSelectTab={selectTab}
-        activePlatform={activePlatform}
         activeVideoUrl={activeVideoUrl}
         onSubmitVideoUrl={handleSubmitVideoUrl}
         onGoToWelcome={goToWelcome}

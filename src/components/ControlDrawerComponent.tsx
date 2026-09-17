@@ -5,14 +5,11 @@ import { ManageStreamingSitesComponent } from "@/components/ManageStreamingSites
 import { PlayFormComponent } from "@/components/PlayFormComponent";
 import { WatchHistoryListComponent } from "@/components/WatchHistoryListComponent";
 import { WatchTabBarComponent } from "@/components/WatchTabBarComponent";
-import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
 import { useControlDrawerStore } from "@/store/control-drawer-store";
-import { StreamingPlatform } from "@/types/streaming-platform";
 
 interface ControlDrawerComponentProps {
   activeTabId: string;
   onSelectTab: (tabId: string) => void;
-  activePlatform: StreamingPlatform | undefined;
   activeVideoUrl: string;
   onSubmitVideoUrl: (videoUrl: string) => void;
   onGoToWelcome: () => void;
@@ -21,7 +18,6 @@ interface ControlDrawerComponentProps {
 export function ControlDrawerComponent({
   activeTabId,
   onSelectTab,
-  activePlatform,
   activeVideoUrl,
   onSubmitVideoUrl,
   onGoToWelcome,
@@ -66,24 +62,10 @@ export function ControlDrawerComponent({
             <WatchTabBarComponent activeTabId={activeTabId} onSelectTab={onSelectTab} />
           </div>
 
-          {activeTabId === CUSTOM_URL_TAB_ID ? (
-            <div>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
-              <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
-            </div>
-          ) : null}
-
-          {activePlatform ? (
-            <a
-              href={activePlatform.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border-default px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent"
-            >
-              Open {activePlatform.name} in new tab
-              <span aria-hidden="true">↗</span>
-            </a>
-          ) : null}
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
+            <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
+          </div>
 
           <ManageStreamingSitesComponent />
 
