@@ -26,7 +26,7 @@ export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFor
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-2">
       <label htmlFor="video-url" className="sr-only">
         Video URL
       </label>
@@ -40,21 +40,21 @@ export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFor
         onChange={(event) => setVideoUrlInput(event.target.value)}
         aria-invalid={Boolean(validationError)}
         aria-describedby={validationError ? "video-url-error" : undefined}
-        className="min-w-0 flex-1 rounded-lg border border-border-default bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+        className="min-w-0 rounded-lg border border-border-default bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
       />
 
-      <button
-        type="submit"
-        className="shrink-0 rounded-lg bg-accent-strong px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
-      >
-        ▶ Play
-      </button>
-
       {validationError ? (
-        <p id="video-url-error" role="alert" className="basis-full text-xs text-red-400">
+        <p id="video-url-error" role="alert" className="text-xs text-red-400">
           {validationError}
         </p>
       ) : null}
+
+      <button
+        type="submit"
+        className="rounded-lg bg-accent-strong px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
+      >
+        ▶ Play
+      </button>
     </form>
   );
 }

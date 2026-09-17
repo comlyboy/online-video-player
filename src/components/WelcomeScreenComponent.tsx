@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 
 import { streamingPlatforms } from "@/data/streaming-platforms";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
+import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 
 interface WelcomeScreenComponentProps {
   onSelectTab: (tabId: string) => void;
@@ -11,6 +12,7 @@ interface WelcomeScreenComponentProps {
 
 export function WelcomeScreenComponent({ onSelectTab }: WelcomeScreenComponentProps) {
   const [selectedTabId, setSelectedTabId] = useState("");
+  const customSites = useCustomStreamingSitesStore((state) => state.customSites);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,7 +50,7 @@ export function WelcomeScreenComponent({ onSelectTab }: WelcomeScreenComponentPr
             <option value="" disabled>
               Select a platform…
             </option>
-            {streamingPlatforms.map((platform) => (
+            {[...streamingPlatforms, ...customSites].map((platform) => (
               <option key={platform.id} value={platform.id}>
                 {platform.name}
               </option>
