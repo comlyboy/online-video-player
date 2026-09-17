@@ -17,7 +17,7 @@ export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFor
     event.preventDefault();
 
     if (!isPlayableVideoUrl(videoUrlInput)) {
-      setValidationError("Enter a full video URL, starting with http:// or https://");
+      setValidationError("Enter a full URL starting with http:// or https://");
       return;
     }
 
@@ -26,32 +26,32 @@ export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFor
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-border-default bg-background-elevated p-5">
-      <label htmlFor="video-url" className="mb-3 block text-sm font-medium text-foreground">
+    <form onSubmit={handleSubmit} className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+      <label htmlFor="video-url" className="sr-only">
         Video URL
       </label>
 
-      <div className="flex flex-col gap-3 md:flex-row">
-        <input
-          id="video-url"
-          type="url"
-          inputMode="url"
-          placeholder="https://example.com/video.mp4"
-          value={videoUrlInput}
-          onChange={(event) => setVideoUrlInput(event.target.value)}
-          className="flex-1 rounded-xl border border-border-default bg-background px-5 py-4 text-foreground outline-none transition focus:border-accent"
-        />
+      <input
+        id="video-url"
+        type="url"
+        inputMode="url"
+        placeholder="Paste a direct video URL…"
+        value={videoUrlInput}
+        onChange={(event) => setVideoUrlInput(event.target.value)}
+        aria-invalid={Boolean(validationError)}
+        aria-describedby={validationError ? "video-url-error" : undefined}
+        className="min-w-0 flex-1 rounded-lg border border-border-default bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+      />
 
-        <button
-          type="submit"
-          className="rounded-xl bg-accent-strong px-8 py-4 font-semibold text-background transition hover:opacity-90"
-        >
-          ▶ Play
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="shrink-0 rounded-lg bg-accent-strong px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
+      >
+        ▶ Play
+      </button>
 
       {validationError ? (
-        <p role="alert" className="mt-3 text-sm text-red-400">
+        <p id="video-url-error" role="alert" className="basis-full text-xs text-red-400">
           {validationError}
         </p>
       ) : null}

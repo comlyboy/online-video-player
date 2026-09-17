@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { FooterComponent } from "@/components/FooterComponent";
-import { HeaderComponent } from "@/components/HeaderComponent";
 import { COLOR_SCHEME_STORAGE_KEY, ColorScheme } from "@/types/color-scheme";
 
 import "./globals.css";
@@ -48,10 +46,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: colorSchemeInitScript }} />
       </head>
-      <body className="flex min-h-full flex-col bg-background text-foreground">
-        <HeaderComponent />
-        <main className="flex-1">{children}</main>
-        <FooterComponent />
+      <body className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
       </body>
     </html>
   );
