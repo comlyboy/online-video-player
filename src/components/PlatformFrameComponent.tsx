@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { openPopupWindow } from "@/lib/popup-window";
 import { StreamingPlatform } from "@/types/streaming-platform";
 
 interface PlatformFrameComponentProps {
@@ -15,12 +16,13 @@ export function PlatformFrameComponent({ platform }: PlatformFrameComponentProps
 
   useEffect(() => {
     if (platform.canEmbed === false) {
+      openPopupWindow(platform.websiteUrl, platform.id);
       return;
     }
 
     const timeoutId = window.setTimeout(() => setShowEmbedHint(true), EMBED_HINT_DELAY_MS);
     return () => window.clearTimeout(timeoutId);
-  }, [platform.id, platform.canEmbed]);
+  }, [platform.id, platform.canEmbed, platform.websiteUrl]);
 
   if (platform.canEmbed === false) {
     return (
@@ -39,18 +41,17 @@ export function PlatformFrameComponent({ platform }: PlatformFrameComponentProps
         </svg>
         <p className="text-sm font-semibold text-foreground">{platform.name} can&apos;t be embedded here</p>
         <p className="max-w-sm text-xs leading-relaxed text-foreground-muted">
-          This site sends a header that blocks other pages from displaying it in a frame, so it can only be
-          opened directly.
+          This site sends a header that blocks other pages from displaying it in a frame. We just tried
+          opening it in a separate window, if your browser blocked that popup, use the button below.
         </p>
-        <a
-          href={platform.websiteUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => openPopupWindow(platform.websiteUrl, platform.id)}
           className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-accent-strong px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
         >
           Open {platform.name}
           <span aria-hidden="true">↗</span>
-        </a>
+        </button>
       </div>
     );
   }
@@ -71,14 +72,13 @@ export function PlatformFrameComponent({ platform }: PlatformFrameComponentProps
         <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center px-4">
           <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-border-default bg-background-elevated px-4 py-2 text-xs text-foreground-muted shadow-lg">
             Nothing showing? This site may block embedding.
-            <a
-              href={platform.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => openPopupWindow(platform.websiteUrl, platform.id)}
               className="font-semibold text-accent hover:underline"
             >
               Open directly ↗
-            </a>
+            </button>
           </div>
         </div>
       ) : null}
