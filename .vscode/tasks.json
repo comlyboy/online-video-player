@@ -4,7 +4,7 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "start",
+      "script": "dev",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -12,31 +12,17 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": {
-            "regexp": "Changes detected"
+            "regexp": "Starting\\.\\.\\."
           },
           "endsPattern": {
-            "regexp": "bundle generation (complete|failed)"
+            "regexp": "Ready in"
           }
         }
       }
     },
     {
       "type": "npm",
-      "script": "test",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "Changes detected"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation (complete|failed)"
-          }
-        }
-      }
+      "script": "lint"
     }
   ]
 }

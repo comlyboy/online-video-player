@@ -1,277 +1,102 @@
-# 🎥 Online Video Player
+# Online Video Player
 
-A lightweight, modern web-based video player built with **Angular 22** and **ArtPlayer.js** that streams videos directly from a URL.
+A dark, modern web app built with Next.js (App Router, static export), Tailwind CSS and Zustand.
 
-Unlike traditional video players, this application is designed exclusively for **URL-based playback**. Simply paste a direct video URL and start watching instantly—no uploads, file management, or local storage required.
+It does two things:
 
----
-
-## ✨ Features
-
-- 🎬 Play videos directly from a URL
-- ⚡ No video uploads or file selection
-- 📱 Responsive design for desktop and mobile
-- 🎨 Modern UI powered by Angular 22
-- 🚀 Fast playback using ArtPlayer.js
-- 🔗 Supports publicly accessible video URLs
-- ⏯️ Built-in playback controls
-- 🔊 Volume and mute controls
-- ⚙️ Fullscreen support
-- ⏩ Playback speed controls
-- 📺 Picture-in-Picture (browser support dependent)
+1. **Streaming platforms** - quick-access cards that open external streaming websites (currently Goojara and MovieBox HD) in a new tab, so you watch directly on their own site.
+2. **Play from a URL** - paste a direct video link (MP4, WebM, Ogg, and more with plugins) and it plays right in the app using [ArtPlayer](https://artplayer.org/), with fullscreen, Picture-in-Picture, playback speed and more.
 
 ---
 
-## 📸 Preview
+## Tech stack
 
-> _Add screenshots or a demo GIF here._
-
-```
-/docs/images/player.png
-```
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework:** Angular 22
+- **Framework:** Next.js (App Router), built as a static export (`output: "export"`)
 - **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **State:** Zustand, with the `persist` middleware for saved preferences
 - **Player:** ArtPlayer.js
-- **Styling:** CSS / SCSS
-- **Package Manager:** npm
 
 ---
 
-## 📦 Installation
+## Getting started
 
-Clone the repository.
-
-```bash
-git clone https://github.com/comlyboy/online-video-player.git
-```
-
-Navigate into the project.
-
-```bash
-cd online-video-player
-```
-
-Install dependencies.
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Start the development server.
+Start the dev server (runs on port 4200, not 3000):
 
 ```bash
-ng serve
+npm run dev
 ```
 
-Open your browser.
-
-```
-http://localhost:4200
-```
+Open [http://localhost:4200](http://localhost:4200).
 
 ---
 
-## 🚀 Build
+## Build
 
-Create a production build.
+Produce a static export:
 
 ```bash
-ng build
+npm run build
 ```
 
-The compiled application will be located in:
+The static site is written to `out/`. Preview it locally with:
+
+```bash
+npm run start
+```
+
+Because this is a static export, there is no Node.js server at runtime. Deploy the `out/` directory to any static host (Vercel, Netlify, S3 + CloudFront, GitHub Pages, etc.).
+
+---
+
+## Project structure
 
 ```
-dist/
+src/
+├── app/                 # Routes (App Router)
+│   ├── page.tsx         # Home: hero, streaming platforms, features
+│   └── play/page.tsx    # Play-from-URL page
+├── components/          # UI components (each named *Component)
+├── data/                # Static data, e.g. the streaming platform list
+├── lib/                 # Small framework-free helper functions
+├── store/               # Zustand stores
+└── types/                # Shared TypeScript types
 ```
 
 ---
 
-## ▶️ Usage
+## Notes on the streaming platform cards
 
-1. Open the application.
-2. Paste a publicly accessible direct video URL.
-3. Click **Play**.
-4. Enjoy streaming.
-
-Example:
-
-```
-https://example.com/video.mp4
-```
+The platform cards link out to third-party websites in a new tab; the app does not embed, proxy, or rehost their content. Playback of those platforms happens entirely on their own site.
 
 ---
 
-## 📹 Supported Formats
+## Video URL requirements (Play from a URL)
 
-Support depends on the browser.
+Supports publicly accessible, direct media file links.
 
-Common supported formats include:
-
-- MP4
-- WebM
-- Ogg
-- HLS (with additional configuration)
-- DASH (with additional configuration)
-
----
-
-## 🌐 Video URL Requirements
-
-The application only plays **direct video URLs**.
-
-✅ Supported
+Works:
 
 ```
 https://example.com/movie.mp4
 ```
 
-```
-https://cdn.example.com/videos/sample.webm
-```
-
-❌ Not Supported
+Does not work:
 
 ```
 https://youtube.com/watch?v=xxxx
-```
-
-```
 https://vimeo.com/xxxx
-```
-
-```
 Local video files
 ```
 
-```
-Video pages instead of direct media URLs
-```
-
 ---
 
-## 📁 Project Structure
+## License
 
-```
-src/
-├── app/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   └── shared/
-├── assets/
-├── environments/
-└── styles/
-```
-
----
-
-## 📚 ArtPlayer
-
-This project uses **ArtPlayer.js**, a modern HTML5 video player with an extensive plugin ecosystem and customizable UI.
-
-Official Website:
-
-https://artplayer.org/
-
-Documentation:
-
-https://artplayer.org/document/en/
-
-GitHub:
-
-https://github.com/zhw2590582/ArtPlayer
-
----
-
-## 💡 Future Enhancements
-
-- Playlist support
-- Subtitle loading
-- Subtitle search
-- HLS support
-- DASH support
-- Keyboard shortcuts
-- Video history
-- Recently played videos
-- URL validation
-- Theme switching
-- Custom themes
-- Playback persistence
-- Chromecast support
-- AirPlay support
-- Screenshot capture
-- Thumbnail previews
-- Media Session API
-- Keyboard accessibility
-- Mobile gesture controls
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome.
-
-To contribute:
-
-1. Fork the repository.
-2. Create a feature branch.
-
-```bash
-git checkout -b feature/my-feature
-```
-
-3. Commit your changes.
-
-```bash
-git commit -m "Add awesome feature"
-```
-
-4. Push your branch.
-
-```bash
-git push origin feature/my-feature
-```
-
-5. Open a Pull Request.
-
----
-
-## 🐛 Reporting Issues
-
-Found a bug or have a feature request?
-
-Please open an issue describing:
-
-- Expected behaviour
-- Actual behaviour
-- Browser
-- Operating System
-- Steps to reproduce
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 🙏 Acknowledgements
-
-- Angular Team
-- ArtPlayer.js
-- TypeScript
-
----
-
-## ⭐ Support
-
-If you find this project useful, consider giving it a ⭐ on GitHub.
-
-It helps others discover the project and motivates continued development.
+MIT
