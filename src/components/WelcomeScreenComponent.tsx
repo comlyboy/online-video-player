@@ -25,8 +25,10 @@ export function WelcomeScreenComponent({ onSelectTab }: WelcomeScreenComponentPr
   return (
     <div className="flex h-full w-full items-center justify-center bg-background-elevated px-6">
       <div className="w-full max-w-md text-center">
-        <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-strong text-2xl font-bold text-background">
-          ▶
+        <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-strong text-background">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7" aria-hidden="true">
+            <path d="M9.5 7.5c0-.7.77-1.13 1.37-.76l6.5 4c.57.35.57 1.17 0 1.52l-6.5 4c-.6.37-1.37-.06-1.37-.76v-8Z" />
+          </svg>
         </div>
 
         <h1 className="text-2xl font-bold text-foreground">Welcome to Online Video Player</h1>
