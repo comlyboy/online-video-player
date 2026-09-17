@@ -1,19 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Anton, JetBrains_Mono, Manrope } from "next/font/google";
 
 import { ServiceWorkerRegistrarComponent } from "@/components/ServiceWorkerRegistrarComponent";
 import { COLOR_SCHEME_STORAGE_KEY, ColorScheme } from "@/types/color-scheme";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFont = Anton({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-display",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodyFont = Manrope({
   subsets: ["latin"],
+  variable: "--font-body",
+});
+
+const monoFont = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono-tech",
 });
 
 export const metadata: Metadata = {
@@ -42,21 +48,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0891b2",
+  themeColor: "#d6922e",
 };
 
 const colorSchemeInitScript = `
 (function () {
   try {
     var storedValue = window.localStorage.getItem("${COLOR_SCHEME_STORAGE_KEY}");
-    var colorScheme = "${ColorScheme.CYAN}";
+    var colorScheme = "${ColorScheme.AMBER}";
     if (storedValue) {
       var parsedValue = JSON.parse(storedValue);
-      colorScheme = (parsedValue && parsedValue.state && parsedValue.state.colorScheme) || "${ColorScheme.CYAN}";
+      colorScheme = (parsedValue && parsedValue.state && parsedValue.state.colorScheme) || "${ColorScheme.AMBER}";
     }
     document.documentElement.setAttribute("data-color-scheme", colorScheme);
   } catch (error) {
-    document.documentElement.setAttribute("data-color-scheme", "${ColorScheme.CYAN}");
+    document.documentElement.setAttribute("data-color-scheme", "${ColorScheme.AMBER}");
   }
 })();
 `;
@@ -65,8 +71,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-color-scheme={ColorScheme.CYAN}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-color-scheme={ColorScheme.AMBER}
+      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: colorSchemeInitScript }} />

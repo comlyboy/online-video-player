@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { ControlDrawerComponent } from "@/components/ControlDrawerComponent";
 import { ControlDrawerTriggerComponent } from "@/components/ControlDrawerTriggerComponent";
 import { PlatformFrameComponent } from "@/components/PlatformFrameComponent";
+import { SourceBadgeComponent } from "@/components/SourceBadgeComponent";
+import { VideoPlayerErrorBoundaryComponent } from "@/components/VideoPlayerErrorBoundaryComponent";
 import { WelcomeScreenComponent } from "@/components/WelcomeScreenComponent";
-import { streamingPlatforms } from "@/data/streaming-platforms";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
@@ -60,22 +61,27 @@ export function WatchAppComponent() {
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
   }
 
-  const activePlatform = [...streamingPlatforms, ...customSites].find((platform) => platform.id === activeTabId);
+  const activePlatform = customSites.find((platform) => platform.id === activeTabId);
+  const sourceLabel = activePlatform ? activePlatform.name.toUpperCase() : activeVideoUrl ? "CUSTOM URL" : "";
 
   return (
     <div className="relative flex h-full min-h-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1">
         {activeTabId === "" ? (
-          <WelcomeScreenComponent onSelectTab={selectTab} />
+          <WelcomeScreenComponent />
         ) : activePlatform ? (
           <PlatformFrameComponent key={activePlatform.id} platform={activePlatform} />
         ) : activeVideoUrl ? (
-          <VideoPlayerComponent key={activeVideoUrl} videoUrl={activeVideoUrl} />
+          <VideoPlayerErrorBoundaryComponent key={activeVideoUrl}>
+            <VideoPlayerComponent videoUrl={activeVideoUrl} />
+          </VideoPlayerErrorBoundaryComponent>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-background-elevated text-center text-foreground-muted">
             <p className="max-w-sm px-6">Paste a direct video URL below and press Play to start streaming here.</p>
           </div>
         )}
+
+        {sourceLabel ? <SourceBadgeComponent label={sourceLabel} /> : null}
       </div>
 
       <ControlDrawerTriggerComponent />

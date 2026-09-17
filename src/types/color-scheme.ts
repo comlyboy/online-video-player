@@ -1,8 +1,8 @@
 export enum ColorScheme {
-  CYAN = "cyan",
-  INDIGO = "indigo",
+  AMBER = "amber",
+  TEAL = "teal",
   ROSE = "rose",
-  EMERALD = "emerald",
+  VIOLET = "violet",
 }
 
 export const COLOR_SCHEME_STORAGE_KEY = "online-video-player-color-scheme";
@@ -14,8 +14,8 @@ export interface ColorSchemeOption {
 }
 
 export const colorSchemeOptions: ColorSchemeOption[] = [
-  { scheme: ColorScheme.CYAN, label: "Cyan", swatchColor: "#22d3ee" },
-  { scheme: ColorScheme.INDIGO, label: "Indigo", swatchColor: "#818cf8" },
-  { scheme: ColorScheme.ROSE, label: "Rose", swatchColor: "#fb7185" },
-  { scheme: ColorScheme.EMERALD, label: "Emerald", swatchColor: "#34d399" },
+  { scheme: ColorScheme.AMBER, label: "Marquee amber", swatchColor: "#e8a33d" },
+  { scheme: ColorScheme.TEAL, label: "Reel teal", swatchColor: "#7fa6a0" },
+  { scheme: ColorScheme.ROSE, label: "Velvet rose", swatchColor: "#c97b90" },
+  { scheme: ColorScheme.VIOLET, label: "Backlot violet", swatchColor: "#a78bc9" },
 ];

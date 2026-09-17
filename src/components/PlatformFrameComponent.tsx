@@ -58,11 +58,15 @@ export function PlatformFrameComponent({ platform }: PlatformFrameComponentProps
 
   return (
     <div className="relative h-full w-full">
+      <div
+        className="h-4 w-full border-b border-border-default bg-[radial-gradient(circle,var(--color-border)_2.4px,transparent_2.8px)] bg-size-[20px_16px] bg-position-[10px_center]"
+        aria-hidden="true"
+      />
       <iframe
         key={platform.id}
         src={platform.websiteUrl}
         title={`${platform.name} website`}
-        className="h-full w-full bg-black"
+        className="h-[calc(100%-16px)] w-full bg-black"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         referrerPolicy="no-referrer"
         loading="lazy"

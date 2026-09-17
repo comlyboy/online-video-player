@@ -11,7 +11,7 @@ interface ColorSchemeStore {
 export const useColorSchemeStore = create<ColorSchemeStore>()(
   persist(
     (set) => ({
-      colorScheme: ColorScheme.CYAN,
+      colorScheme: ColorScheme.AMBER,
       setColorScheme: (colorScheme) => set({ colorScheme }),
     }),
     { name: COLOR_SCHEME_STORAGE_KEY },

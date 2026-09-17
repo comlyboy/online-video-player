@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import { isPlayableVideoUrl } from "@/lib/video-url";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 
-const ACCENT_COLOR_PALETTE = ["#22d3ee", "#818cf8", "#fb7185", "#34d399", "#fbbf24"];
+const ACCENT_COLOR_PALETTE = ["#e8a33d", "#7fa6a0", "#c97b90", "#a78bc9", "#cf8b28"];
 
 function pickAccentColor(existingSiteCount: number): string {
   return ACCENT_COLOR_PALETTE[existingSiteCount % ACCENT_COLOR_PALETTE.length];

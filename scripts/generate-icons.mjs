@@ -9,8 +9,8 @@ const publicDir = path.join(rootDir, "public");
 const iconsDir = path.join(publicDir, "icons");
 const sourceSvgPath = path.join(publicDir, "icon.svg");
 
-const BRAND_BACKGROUND = "#0891b2";
-const BRAND_INK = "#020617";
+const BRAND_BACKGROUND = "#d6922e";
+const BRAND_INK = "#0b0a08";
 
 async function renderPng(svgBuffer, size, outputPath) {
   await sharp(svgBuffer, { density: 384 }).resize(size, size).png().toFile(outputPath);
@@ -32,15 +32,15 @@ function buildOgImageSvg() {
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f172a" />
-      <stop offset="1" stop-color="#020617" />
+      <stop offset="0" stop-color="#16130e" />
+      <stop offset="1" stop-color="#0b0a08" />
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
-  <rect x="486" y="145" width="228" height="228" rx="50" fill="#0891b2" />
-  <path d="M576 214c0-9.9 10.9-16 19.4-10.8l67 41c8.1 5 8.1 16.6 0 21.6l-67 41c-8.5 5.2-19.4-0.9-19.4-10.8V214Z" fill="#020617" />
-  <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#e2e8f0">Online Video Player</text>
-  <text x="600" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#94a3b8">Streaming platforms and direct video URLs, in one place</text>
+  <rect x="486" y="145" width="228" height="228" rx="50" fill="#d6922e" />
+  <path d="M576 214c0-9.9 10.9-16 19.4-10.8l67 41c8.1 5 8.1 16.6 0 21.6l-67 41c-8.5 5.2-19.4-0.9-19.4-10.8V214Z" fill="#0b0a08" />
+  <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#f3ede0">Online Video Player</text>
+  <text x="600" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#a89a7d">Streaming platforms and direct video URLs, in one place</text>
 </svg>`;
 }
 

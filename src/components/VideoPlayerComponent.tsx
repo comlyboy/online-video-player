@@ -19,51 +19,73 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       return;
     }
 
-    const artplayerInstance = new Artplayer({
-      container: playerContainerRef.current,
-      url: videoUrl,
-      poster: buildPlaceholderPosterDataUrl(["Press play to start streaming"]),
-      volume: 0.2,
-      isLive: false,
-      muted: false,
-      autoplay: false,
-      pip: true,
-      autoSize: false,
-      autoMini: true,
-      screenshot: true,
-      setting: true,
-      loop: false,
-      flip: true,
-      playbackRate: true,
-      aspectRatio: true,
-      fullscreen: true,
-      fullscreenWeb: true,
-      subtitleOffset: true,
-      miniProgressBar: true,
-      mutex: true,
-      backdrop: true,
-      playsInline: true,
-      autoPlayback: true,
-      airplay: true,
-      theme: "#06b6d4",
-    });
+    const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || "#d6922e";
 
-    artplayerInstance.on("video:error", () => {
-      artplayerInstance.pause();
-      setHasPlaybackError(true);
-    });
+    let artplayerInstance: Artplayer | null = null;
+
+    try {
+      artplayerInstance = new Artplayer({
+        container: playerContainerRef.current,
+        url: videoUrl,
+        poster: buildPlaceholderPosterDataUrl(["Press play to start streaming"]),
+        volume: 0.2,
+        isLive: false,
+        muted: false,
+        autoplay: false,
+        pip: true,
+        autoSize: false,
+        autoMini: true,
+        screenshot: true,
+        setting: true,
+        loop: false,
+        flip: true,
+        playbackRate: true,
+        aspectRatio: true,
+        fullscreen: true,
+        fullscreenWeb: true,
+        subtitleOffset: true,
+        miniProgressBar: true,
+        mutex: true,
+        backdrop: true,
+        playsInline: true,
+        autoPlayback: true,
+        airplay: true,
+        theme: accentColor,
+      });
+
+      artplayerInstance.on("video:error", (error) => {
+        console.error("ArtPlayer playback error:", error);
+        try {
+          artplayerInstance?.pause();
+        } catch (pauseError) {
+          console.error("ArtPlayer failed to pause after an error:", pauseError);
+        }
+        setHasPlaybackError(true);
+      });
+    } catch (error) {
+      console.error("ArtPlayer failed to initialise:", error);
+      queueMicrotask(() => setHasPlaybackError(true));
+    }
 
     artplayerInstanceRef.current = artplayerInstance;
 
     return () => {
-      artplayerInstance.destroy(false);
+      try {
+        artplayerInstance?.destroy(false);
+      } catch (error) {
+        console.error("ArtPlayer failed to tear down cleanly:", error);
+      }
       artplayerInstanceRef.current = null;
     };
   }, [videoUrl]);
 
   return (
     <div className="relative h-full w-full bg-black">
-      <div ref={playerContainerRef} className="h-full w-full" />
+      <div
+        className="h-4 w-full border-b border-border-default bg-[radial-gradient(circle,var(--color-border)_2.4px,transparent_2.8px)] bg-size-[20px_16px] bg-position-[10px_center]"
+        aria-hidden="true"
+      />
+      <div ref={playerContainerRef} className="h-[calc(100%-16px)] w-full" />
 
       {hasPlaybackError ? (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-background-elevated px-6 text-center">

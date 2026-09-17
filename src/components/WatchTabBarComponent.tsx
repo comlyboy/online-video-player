@@ -1,6 +1,5 @@
 "use client";
 
-import { streamingPlatforms } from "@/data/streaming-platforms";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 
@@ -11,11 +10,10 @@ interface WatchTabBarComponentProps {
 
 export function WatchTabBarComponent({ activeTabId, onSelectTab }: WatchTabBarComponentProps) {
   const customSites = useCustomStreamingSitesStore((state) => state.customSites);
-  const allPlatforms = [...streamingPlatforms, ...customSites];
 
   return (
     <div role="tablist" aria-label="Watch source" className="flex flex-col gap-1.5">
-      {allPlatforms.map((platform) => {
+      {customSites.map((platform) => {
         const isActive = platform.id === activeTabId;
 
         return (
