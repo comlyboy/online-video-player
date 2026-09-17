@@ -3,6 +3,7 @@
 import Artplayer from "artplayer";
 import { useEffect, useRef, useState } from "react";
 
+import { cacheVideoForReuse, getCachedVideoBlob } from "@/database";
 import { buildPlaceholderPosterDataUrl } from "@/lib/video-placeholder";
 
 interface VideoPlayerComponentProps {
@@ -19,62 +20,92 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       return;
     }
 
-    const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || "#d6922e";
-
+    let isCancelled = false;
     let artplayerInstance: Artplayer | null = null;
+    let cachedObjectUrl: string | null = null;
 
-    try {
-      artplayerInstance = new Artplayer({
-        container: playerContainerRef.current,
-        url: videoUrl,
-        poster: buildPlaceholderPosterDataUrl(["Press play to start streaming"]),
-        volume: 0.2,
-        isLive: false,
-        muted: false,
-        autoplay: false,
-        pip: true,
-        autoSize: false,
-        autoMini: true,
-        screenshot: true,
-        setting: true,
-        loop: false,
-        flip: true,
-        playbackRate: true,
-        aspectRatio: true,
-        fullscreen: true,
-        fullscreenWeb: true,
-        subtitleOffset: true,
-        miniProgressBar: true,
-        mutex: true,
-        backdrop: true,
-        playsInline: true,
-        autoPlayback: true,
-        airplay: true,
-        theme: accentColor,
-      });
+    async function setUpPlayer() {
+      const cachedVideoBlob = await getCachedVideoBlob(videoUrl);
 
-      artplayerInstance.on("video:error", (error) => {
-        console.error("ArtPlayer playback error:", error);
-        try {
-          artplayerInstance?.pause();
-        } catch (pauseError) {
-          console.error("ArtPlayer failed to pause after an error:", pauseError);
-        }
+      if (isCancelled || !playerContainerRef.current) {
+        return;
+      }
+
+      let playbackUrl = videoUrl;
+
+      if (cachedVideoBlob) {
+        cachedObjectUrl = URL.createObjectURL(cachedVideoBlob);
+        playbackUrl = cachedObjectUrl;
+      }
+
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || "#d6922e";
+
+      try {
+        artplayerInstance = new Artplayer({
+          container: playerContainerRef.current,
+          url: playbackUrl,
+          poster: buildPlaceholderPosterDataUrl(["Press play to start streaming"]),
+          volume: 0.2,
+          isLive: false,
+          muted: false,
+          autoplay: false,
+          pip: true,
+          autoSize: false,
+          autoMini: true,
+          screenshot: true,
+          setting: true,
+          loop: false,
+          flip: true,
+          playbackRate: true,
+          aspectRatio: true,
+          fullscreen: true,
+          fullscreenWeb: true,
+          subtitleOffset: true,
+          miniProgressBar: true,
+          mutex: true,
+          backdrop: true,
+          playsInline: true,
+          autoPlayback: true,
+          airplay: true,
+          theme: accentColor,
+        });
+
+        artplayerInstance.on("video:error", (error) => {
+          console.error("ArtPlayer playback error:", error);
+          try {
+            artplayerInstance?.pause();
+          } catch (pauseError) {
+            console.error("ArtPlayer failed to pause after an error:", pauseError);
+          }
+          setHasPlaybackError(true);
+        });
+      } catch (error) {
+        console.error("ArtPlayer failed to initialise:", error);
         setHasPlaybackError(true);
-      });
-    } catch (error) {
-      console.error("ArtPlayer failed to initialise:", error);
-      queueMicrotask(() => setHasPlaybackError(true));
+      }
+
+      artplayerInstanceRef.current = artplayerInstance;
+
+      if (!cachedVideoBlob) {
+        cacheVideoForReuse(videoUrl);
+      }
     }
 
-    artplayerInstanceRef.current = artplayerInstance;
+    setUpPlayer();
 
     return () => {
+      isCancelled = true;
+
       try {
         artplayerInstance?.destroy(false);
       } catch (error) {
         console.error("ArtPlayer failed to tear down cleanly:", error);
       }
+
+      if (cachedObjectUrl) {
+        URL.revokeObjectURL(cachedObjectUrl);
+      }
+
       artplayerInstanceRef.current = null;
     };
   }, [videoUrl]);
