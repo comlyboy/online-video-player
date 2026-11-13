@@ -87,11 +87,14 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       artplayerInstanceRef.current = artplayerInstance;
 
       if (!cachedVideoBlob) {
-        cacheVideoForReuse(videoUrl);
+        void cacheVideoForReuse(videoUrl);
       }
     }
 
-    setUpPlayer();
+    setUpPlayer().catch((error: unknown) => {
+      console.error("Video player setup failed:", error);
+      setHasPlaybackError(true);
+    });
 
     return () => {
       isCancelled = true;

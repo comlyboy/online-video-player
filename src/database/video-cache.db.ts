@@ -13,7 +13,12 @@ function getDbApi() {
 }
 
 export async function getCachedVideoBlob(videoUrl: string) {
-  return getDbApi().get<Blob>({ key: videoUrl, storeName: STORE_NAME });
+  try {
+    return await getDbApi().get<Blob>({ key: videoUrl, storeName: STORE_NAME });
+  } catch (error) {
+    console.warn("Could not read the cached video:", error);
+    return null;
+  }
 }
 
 export async function cacheVideoForReuse(videoUrl: string) {
