@@ -5,12 +5,11 @@ import { FormEvent, useState } from "react";
 import { isPlayableVideoUrl } from "@/lib/video-url";
 
 interface PlayFormComponentProps {
-  initialVideoUrl: string;
   onSubmitVideoUrl: (videoUrl: string) => void;
 }
 
-export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFormComponentProps) {
-  const [videoUrlInput, setVideoUrlInput] = useState(initialVideoUrl);
+export function PlayFormComponent({ onSubmitVideoUrl }: PlayFormComponentProps) {
+  const [videoUrlInput, setVideoUrlInput] = useState("");
   const [validationError, setValidationError] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -23,6 +22,7 @@ export function PlayFormComponent({ initialVideoUrl, onSubmitVideoUrl }: PlayFor
 
     setValidationError("");
     onSubmitVideoUrl(videoUrlInput.trim());
+    setVideoUrlInput("");
   }
 
   return (

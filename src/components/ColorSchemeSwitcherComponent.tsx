@@ -14,7 +14,7 @@ export function ColorSchemeSwitcherComponent() {
   }, [activeColorScheme]);
 
   return (
-    <div role="radiogroup" aria-label="Accent color scheme" className="flex items-center gap-1.5 rounded-lg border border-border-default p-1.5">
+    <div role="radiogroup" aria-label="Accent color scheme" className="flex flex-wrap items-center gap-2 rounded-lg border border-border-default p-2.5">
       {colorSchemeOptions.map((option) => {
         const isActive = option.scheme === activeColorScheme;
 

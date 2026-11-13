@@ -10,3 +10,11 @@ export function isPlayableVideoUrl(candidateUrl: string): boolean {
     return false;
   }
 }
+
+export function readHostName(videoUrl: string): string {
+  try {
+    return new URL(videoUrl).hostname;
+  } catch {
+    return "";
+  }
+}

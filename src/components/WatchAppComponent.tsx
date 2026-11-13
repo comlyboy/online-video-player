@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ControlDrawerComponent } from "@/components/ControlDrawerComponent";
 import { ControlDrawerTriggerComponent } from "@/components/ControlDrawerTriggerComponent";
@@ -26,6 +26,7 @@ export function WatchAppComponent() {
   const requestedVideoUrl = searchParams.get("url") ?? "";
   const requestedTabId = searchParams.get("tab") || (requestedVideoUrl ? CUSTOM_URL_TAB_ID : "");
 
+  const initialVideoUrlRef = useRef(requestedVideoUrl);
   const [activeTabId, setActiveTabId] = useState(requestedTabId);
   const [activeVideoUrl, setActiveVideoUrl] = useState(requestedVideoUrl);
 
@@ -36,8 +37,13 @@ export function WatchAppComponent() {
 
   useEffect(() => {
     loadCustomSites();
-    loadWatchHistory();
-  }, [loadCustomSites, loadWatchHistory]);
+    loadWatchHistory().then(() => {
+      // A video opened from a link counts as watched, so it gets its details looked up and stored too.
+      if (initialVideoUrlRef.current) {
+        void recordWatchedVideoUrl(initialVideoUrlRef.current);
+      }
+    });
+  }, [loadCustomSites, loadWatchHistory, recordWatchedVideoUrl]);
 
   function goToWelcome() {
     setActiveTabId("");

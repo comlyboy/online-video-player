@@ -107,3 +107,30 @@ export function formatFileSize(sizeBytes: number): string {
 
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
+
+export interface VideoMetadataRow {
+  label: string;
+  value: string;
+}
+
+export function buildVideoMetadataRows(metadata: VideoMetadata): VideoMetadataRow[] {
+  const rows: VideoMetadataRow[] = [
+    { label: "File", value: metadata.fileName },
+    { label: "Source", value: metadata.hostName },
+  ];
+
+  if (metadata.durationSeconds !== null) {
+    rows.push({ label: "Duration", value: formatDuration(metadata.durationSeconds) });
+  }
+  if (metadata.widthPixels !== null && metadata.heightPixels !== null) {
+    rows.push({ label: "Resolution", value: `${metadata.widthPixels} × ${metadata.heightPixels}` });
+  }
+  if (metadata.contentType) {
+    rows.push({ label: "Type", value: metadata.contentType });
+  }
+  if (metadata.sizeBytes !== null) {
+    rows.push({ label: "Size", value: formatFileSize(metadata.sizeBytes) });
+  }
+
+  return rows;
+}

@@ -31,6 +31,54 @@
   --color-accent-soft: rgba(167, 139, 201, 0.12);
 }
 
+:root[data-color-scheme="crimson"] {
+  --color-accent: #e05c5c;
+  --color-accent-strong: #cc4a4a;
+  --color-accent-soft: rgba(224, 92, 92, 0.12);
+}
+
+:root[data-color-scheme="orange"] {
+  --color-accent: #ee8a4a;
+  --color-accent-strong: #db7634;
+  --color-accent-soft: rgba(238, 138, 74, 0.12);
+}
+
+:root[data-color-scheme="lime"] {
+  --color-accent: #a3c95a;
+  --color-accent-strong: #8fb446;
+  --color-accent-soft: rgba(163, 201, 90, 0.12);
+}
+
+:root[data-color-scheme="emerald"] {
+  --color-accent: #4fc08d;
+  --color-accent-strong: #3dab7a;
+  --color-accent-soft: rgba(79, 192, 141, 0.12);
+}
+
+:root[data-color-scheme="sky"] {
+  --color-accent: #5aa9e6;
+  --color-accent-strong: #4896d2;
+  --color-accent-soft: rgba(90, 169, 230, 0.12);
+}
+
+:root[data-color-scheme="indigo"] {
+  --color-accent: #7b8ce0;
+  --color-accent-strong: #6677cc;
+  --color-accent-soft: rgba(123, 140, 224, 0.12);
+}
+
+:root[data-color-scheme="fuchsia"] {
+  --color-accent: #d46bc4;
+  --color-accent-strong: #bf56ae;
+  --color-accent-soft: rgba(212, 107, 196, 0.12);
+}
+
+:root[data-color-scheme="slate"] {
+  --color-accent: #9aa6b5;
+  --color-accent-strong: #8794a4;
+  --color-accent-soft: rgba(154, 166, 181, 0.12);
+}
+
 @theme inline {
   --color-background: var(--color-bg);
   --color-background-elevated: var(--color-bg-elevated);

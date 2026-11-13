@@ -1,8 +1,9 @@
 "use client";
 
+import { CurrentlyPlayingComponent } from "@/components/CurrentlyPlayingComponent";
+import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
 import { ColorSchemeSwitcherComponent } from "@/components/ColorSchemeSwitcherComponent";
 import { PlayFormComponent } from "@/components/PlayFormComponent";
-import { VideoMetadataComponent } from "@/components/VideoMetadataComponent";
 import { WatchHistoryListComponent } from "@/components/WatchHistoryListComponent";
 import { useControlDrawerStore } from "@/store/control-drawer-store";
 
@@ -39,34 +40,37 @@ export function ControlDrawerComponent({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-border-default px-4 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Controls</h2>
+        <div className="flex shrink-0 items-center justify-between border-b border-border-default px-5 py-4">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">Now Screening</p>
+            <h2 className="mt-0.5 text-base font-semibold text-foreground">Controls</h2>
+          </div>
           <button
             type="button"
             onClick={close}
             aria-label="Close controls"
-            className="text-foreground-muted transition hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-border-default text-foreground-muted transition hover:border-accent hover:text-accent"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
+        <div className="flex flex-1 flex-col gap-7 overflow-y-auto p-5">
+          <CurrentlyPlayingComponent videoUrl={activeVideoUrl} />
+
           <WatchHistoryListComponent onSelectVideoUrl={onSubmitVideoUrl} />
 
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Appearance</h3>
+          <DrawerSectionComponent title="Appearance">
             <ColorSchemeSwitcherComponent />
-          </div>
+          </DrawerSectionComponent>
 
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Accessibility</h3>
+          <DrawerSectionComponent title="Accessibility">
             <p className="text-xs leading-relaxed text-foreground-muted">
               For automatic captions on any video playing here, turn on your browser&apos;s built-in live
               captioning (e.g. Chrome or Edge: Settings → Accessibility → Live Caption). This app can&apos;t
               switch it on for you, it&apos;s a browser-level feature that works on whatever is playing.
             </p>
-          </div>
+          </DrawerSectionComponent>
 
           <button
             type="button"
@@ -77,11 +81,10 @@ export function ControlDrawerComponent({
           </button>
         </div>
 
-        <div className="max-h-[50vh] shrink-0 overflow-y-auto border-t border-border-default p-4">
-          <VideoMetadataComponent videoUrl={activeVideoUrl} />
-
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
-          <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
+        <div className="shrink-0 border-t border-border-default bg-background-card p-5">
+          <DrawerSectionComponent title="Play from URL">
+            <PlayFormComponent onSubmitVideoUrl={onSubmitVideoUrl} />
+          </DrawerSectionComponent>
         </div>
       </aside>
     </>
