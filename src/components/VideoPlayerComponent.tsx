@@ -6,6 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import { cacheVideoForReuse, getCachedVideoBlob } from "@/database";
 import { buildPlaceholderPosterDataUrl } from "@/lib/video-placeholder";
 
+const FALLBACK_ACCENT_COLOR = "#d6922e";
+
+function readAccentColor(): string {
+  return getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || FALLBACK_ACCENT_COLOR;
+}
+
 interface VideoPlayerComponentProps {
   videoUrl: string;
 }
@@ -38,8 +44,6 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
         playbackUrl = cachedObjectUrl;
       }
 
-      const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || "#d6922e";
-
       // Screenshots need a CORS-enabled video (otherwise the canvas is tainted). Cached blobs are same-origin.
       // If the server rejects CORS, the video errors, so we retry once without it (playback works, screenshots don't).
       function createPlayer(shouldRequestCors: boolean) {
@@ -70,7 +74,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           playsInline: true,
           autoPlayback: true,
           airplay: true,
-          theme: accentColor,
+          theme: readAccentColor(),
           moreVideoAttr: shouldRequestCors ? { crossOrigin: "anonymous" } : {},
         });
 
@@ -114,6 +118,18 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       }
     }
 
+    // Keep the player's accent in step with the colour scheme (set on <html> by the switcher).
+    const colorSchemeObserver = new MutationObserver(() => {
+      const accentColor = readAccentColor();
+      // Skip until the new scheme's CSS has been applied.
+      requestAnimationFrame(() => {
+        if (artplayerInstance) {
+          artplayerInstance.theme = readAccentColor() || accentColor;
+        }
+      });
+    });
+    colorSchemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-color-scheme"] });
+
     setUpPlayer().catch((error: unknown) => {
       console.error("Video player setup failed:", error);
       setHasPlaybackError(true);
@@ -121,6 +137,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
 
     return () => {
       isCancelled = true;
+      colorSchemeObserver.disconnect();
 
       try {
         artplayerInstance?.destroy(false);
