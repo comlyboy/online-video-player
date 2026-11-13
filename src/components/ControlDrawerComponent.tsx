@@ -11,12 +11,14 @@ interface ControlDrawerComponentProps {
   activeVideoUrl: string;
   onSubmitVideoUrl: (videoUrl: string) => void;
   onGoToWelcome: () => void;
+  onStopWatching: () => void;
 }
 
 export function ControlDrawerComponent({
   activeVideoUrl,
   onSubmitVideoUrl,
   onGoToWelcome,
+  onStopWatching,
 }: ControlDrawerComponentProps) {
   const isOpen = useControlDrawerStore((state) => state.isOpen);
   const close = useControlDrawerStore((state) => state.close);
@@ -56,7 +58,7 @@ export function ControlDrawerComponent({
         </div>
 
         <div className="flex flex-1 flex-col gap-7 overflow-y-auto p-5">
-          <CurrentlyPlayingComponent videoUrl={activeVideoUrl} />
+          <CurrentlyPlayingComponent videoUrl={activeVideoUrl} onStopWatching={onStopWatching} />
 
           <WatchHistoryListComponent onSelectVideoUrl={onSubmitVideoUrl} />
 

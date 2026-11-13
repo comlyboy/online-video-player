@@ -50,6 +50,11 @@ export function WatchAppComponent() {
     router.replace("/");
   }
 
+  function stopWatching() {
+    setActiveVideoUrl("");
+    goToWelcome();
+  }
+
   function handleSubmitVideoUrl(videoUrl: string) {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
@@ -86,6 +91,7 @@ export function WatchAppComponent() {
         activeVideoUrl={activeVideoUrl}
         onSubmitVideoUrl={handleSubmitVideoUrl}
         onGoToWelcome={goToWelcome}
+        onStopWatching={stopWatching}
       />
     </div>
   );

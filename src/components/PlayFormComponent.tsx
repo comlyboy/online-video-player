@@ -51,7 +51,7 @@ export function PlayFormComponent({ onSubmitVideoUrl }: PlayFormComponentProps) 
 
       <button
         type="submit"
-        className="rounded-lg bg-accent-strong px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
+        className="rounded-lg bg-accent-strong px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90"
       >
         ▶ Play
       </button>

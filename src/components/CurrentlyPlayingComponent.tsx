@@ -6,9 +6,10 @@ import { useWatchHistoryStore } from "@/store/watch-history-store";
 
 interface CurrentlyPlayingComponentProps {
   videoUrl: string;
+  onStopWatching: () => void;
 }
 
-export function CurrentlyPlayingComponent({ videoUrl }: CurrentlyPlayingComponentProps) {
+export function CurrentlyPlayingComponent({ videoUrl, onStopWatching }: CurrentlyPlayingComponentProps) {
   const entry = useWatchHistoryStore((state) => state.historyEntries.find((historyEntry) => historyEntry.videoUrl === videoUrl));
   const isLookingUp = useWatchHistoryStore((state) => state.metadataLookupUrls.includes(videoUrl));
 
@@ -20,6 +21,13 @@ export function CurrentlyPlayingComponent({ videoUrl }: CurrentlyPlayingComponen
             {entry?.metadata?.fileName ?? videoUrl}
           </p>
           <VideoMetadataComponent metadata={entry?.metadata} isLoading={isLookingUp || !entry} />
+          <button
+            type="button"
+            onClick={onStopWatching}
+            className="self-start rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold text-foreground transition hover:border-red-400 hover:text-red-400"
+          >
+            ■ Stop watching
+          </button>
         </div>
       ) : (
         <p className="rounded-xl border border-dashed border-border-default p-3.5 text-xs text-foreground-muted">
