@@ -40,9 +40,11 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
 
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-strong").trim() || "#d6922e";
 
-      try {
-        artplayerInstance = new Artplayer({
-          container: playerContainerRef.current,
+      // Screenshots need a CORS-enabled video (otherwise the canvas is tainted). Cached blobs are same-origin.
+      // If the server rejects CORS, the video errors, so we retry once without it (playback works, screenshots don't).
+      function createPlayer(shouldRequestCors: boolean) {
+        const player = new Artplayer({
+          container: playerContainerRef.current as HTMLDivElement,
           url: playbackUrl,
           poster: buildPlaceholderPosterDataUrl(["Press play to start streaming"]),
           volume: 0.2,
@@ -52,7 +54,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           pip: true,
           autoSize: false,
           autoMini: true,
-          screenshot: true,
+          // Only offer the button when the canvas can be exported; otherwise ArtPlayer rejects with a SecurityError.
+          screenshot: shouldRequestCors || Boolean(cachedObjectUrl),
           setting: true,
           loop: false,
           flip: true,
@@ -68,17 +71,37 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           autoPlayback: true,
           airplay: true,
           theme: accentColor,
+          moreVideoAttr: shouldRequestCors ? { crossOrigin: "anonymous" } : {},
         });
 
-        artplayerInstance.on("video:error", (error) => {
+        player.on("video:error", (error) => {
+          if (shouldRequestCors && player === artplayerInstance) {
+            console.warn("Video failed with CORS enabled, retrying without screenshot support:", error);
+            try {
+              player.destroy(false);
+              artplayerInstance = createPlayer(false);
+              artplayerInstanceRef.current = artplayerInstance;
+            } catch (retryError) {
+              console.error("ArtPlayer failed to retry without CORS:", retryError);
+              setHasPlaybackError(true);
+            }
+            return;
+          }
+
           console.error("ArtPlayer playback error:", error);
           try {
-            artplayerInstance?.pause();
+            player.pause();
           } catch (pauseError) {
             console.error("ArtPlayer failed to pause after an error:", pauseError);
           }
           setHasPlaybackError(true);
         });
+
+        return player;
+      }
+
+      try {
+        artplayerInstance = createPlayer(!cachedObjectUrl);
       } catch (error) {
         console.error("ArtPlayer failed to initialise:", error);
         setHasPlaybackError(true);

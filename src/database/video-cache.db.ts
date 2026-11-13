@@ -40,6 +40,7 @@ export async function cacheVideoForReuse(videoUrl: string) {
 
     await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: videoBlob });
   } catch (error) {
-    console.warn("Could not store this video for reuse:", error);
+    // Expected for servers without CORS headers (or full storage); caching is optional, so keep this quiet.
+    console.debug("Could not store this video for reuse:", error);
   }
 }
