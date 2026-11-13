@@ -27,22 +27,29 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
   const [visibleChannelCount, setVisibleChannelCount] = useState(CHANNELS_PER_PAGE);
   const [validationError, setValidationError] = useState("");
 
+  // Browsers block plain http streams on an https page, so those channels can never play there.
+  const playableChannels = useMemo(() => {
+    const isSecurePage = window.location.protocol === "https:";
+    return isSecurePage ? channels.filter((channel) => channel.url.startsWith("https://")) : channels;
+  }, [channels]);
+  const hiddenChannelCount = channels.length - playableChannels.length;
+
   const groupNames = useMemo(() => {
     const uniqueGroupNames = new Set<string>();
-    channels.forEach((channel) => channel.groupTitle.split(";").forEach((groupName) => uniqueGroupNames.add(groupName.trim())));
+    playableChannels.forEach((channel) => channel.groupTitle.split(";").forEach((groupName) => uniqueGroupNames.add(groupName.trim())));
     return [...uniqueGroupNames].filter(Boolean).sort((first, second) => first.localeCompare(second));
-  }, [channels]);
+  }, [playableChannels]);
 
   const matchingChannels = useMemo(() => {
     const normalizedSearchText = searchText.trim().toLowerCase();
 
-    return channels.filter((channel) => {
+    return playableChannels.filter((channel) => {
       const matchesGroup =
         !selectedGroup || channel.groupTitle.split(";").some((groupName) => groupName.trim() === selectedGroup);
       const matchesSearch = !normalizedSearchText || channel.name.toLowerCase().includes(normalizedSearchText);
       return matchesGroup && matchesSearch;
     });
-  }, [channels, searchText, selectedGroup]);
+  }, [playableChannels, searchText, selectedGroup]);
 
   function handleLoadPlaylist(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -142,7 +149,8 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
           </div>
 
           <p role="status" className="text-[11px] text-foreground-muted">
-            {matchingChannels.length.toLocaleString()} of {channels.length.toLocaleString()} channels
+            {matchingChannels.length.toLocaleString()} of {playableChannels.length.toLocaleString()} channels
+            {hiddenChannelCount > 0 ? ` (${hiddenChannelCount.toLocaleString()} http-only channels hidden, blocked on https pages)` : ""}
           </p>
 
           {visibleChannels.length > 0 ? (

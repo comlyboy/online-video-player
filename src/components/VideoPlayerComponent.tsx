@@ -57,7 +57,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           hlsInstance.attachMedia(videoElement);
           hlsInstance.on(Hls.Events.ERROR, (_event, errorData) => {
             if (errorData.fatal) {
-              console.error("HLS stream failed:", errorData.details);
+              // Expected for dead or blocked channels; the error panel tells the user, so avoid the dev error overlay.
+              console.warn("HLS stream failed:", errorData.details);
               setHasPlaybackError(true);
             }
           });
@@ -119,7 +120,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
             return;
           }
 
-          console.error("ArtPlayer playback error:", error);
+          console.warn("ArtPlayer playback error:", error);
           try {
             player.pause();
           } catch (pauseError) {
@@ -195,9 +196,13 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
             <path strokeLinecap="round" d="M12 8v5" />
             <circle cx="12" cy="16" r="0.5" fill="currentColor" />
           </svg>
-          <p className="text-sm font-semibold text-foreground">This video could not be loaded</p>
+          <p className="text-sm font-semibold text-foreground">
+            {isHlsUrl(videoUrl) ? "This channel is not available" : "This video could not be loaded"}
+          </p>
           <p className="max-w-xs text-xs leading-relaxed text-foreground-muted">
-            Check that the URL points directly to a video file and is publicly accessible, then try again.
+            {isHlsUrl(videoUrl)
+              ? "It may be offline, blocked in your region, or it does not allow browsers to play it. Pick another channel from the playlist."
+              : "Check that the URL points directly to a video file and is publicly accessible, then try again."}
           </p>
         </div>
       ) : null}
