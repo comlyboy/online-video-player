@@ -39,16 +39,6 @@ export function WatchAppComponent() {
     loadWatchHistory();
   }, [loadCustomSites, loadWatchHistory]);
 
-  function selectTab(tabId: string) {
-    setActiveTabId(tabId);
-
-    if (tabId === CUSTOM_URL_TAB_ID && activeVideoUrl) {
-      router.replace(`/?tab=${tabId}&url=${encodeURIComponent(activeVideoUrl)}`);
-    } else {
-      router.replace(`/?tab=${tabId}`);
-    }
-  }
-
   function goToWelcome() {
     setActiveTabId("");
     router.replace("/");
@@ -87,8 +77,6 @@ export function WatchAppComponent() {
       <ControlDrawerTriggerComponent />
 
       <ControlDrawerComponent
-        activeTabId={activeTabId}
-        onSelectTab={selectTab}
         activeVideoUrl={activeVideoUrl}
         onSubmitVideoUrl={handleSubmitVideoUrl}
         onGoToWelcome={goToWelcome}

@@ -1,23 +1,18 @@
 "use client";
 
 import { ColorSchemeSwitcherComponent } from "@/components/ColorSchemeSwitcherComponent";
-import { ManageStreamingSitesComponent } from "@/components/ManageStreamingSitesComponent";
 import { PlayFormComponent } from "@/components/PlayFormComponent";
+import { VideoMetadataComponent } from "@/components/VideoMetadataComponent";
 import { WatchHistoryListComponent } from "@/components/WatchHistoryListComponent";
-import { WatchTabBarComponent } from "@/components/WatchTabBarComponent";
 import { useControlDrawerStore } from "@/store/control-drawer-store";
 
 interface ControlDrawerComponentProps {
-  activeTabId: string;
-  onSelectTab: (tabId: string) => void;
   activeVideoUrl: string;
   onSubmitVideoUrl: (videoUrl: string) => void;
   onGoToWelcome: () => void;
 }
 
 export function ControlDrawerComponent({
-  activeTabId,
-  onSelectTab,
   activeVideoUrl,
   onSubmitVideoUrl,
   onGoToWelcome,
@@ -58,16 +53,11 @@ export function ControlDrawerComponent({
 
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
           <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Watch source</h3>
-            <WatchTabBarComponent activeTabId={activeTabId} onSelectTab={onSelectTab} />
-          </div>
-
-          <div>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
             <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
-          </div>
 
-          <ManageStreamingSitesComponent />
+            <VideoMetadataComponent videoUrl={activeVideoUrl} />
+          </div>
 
           <WatchHistoryListComponent onSelectVideoUrl={onSubmitVideoUrl} />
 
