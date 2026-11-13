@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { PlayIconComponent } from "@/components/icons/PlayIconComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
 import { PlaylistPickerComponent } from "@/components/PlaylistPickerComponent";
 import { PlaylistStatus, usePlaylistStore } from "@/store/playlist-store";
@@ -130,7 +131,7 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
                         <span className="block truncate text-sm text-foreground">{channel.name}</span>
                         <span className="block truncate text-[11px] text-foreground-muted">{channel.groupTitle}</span>
                       </span>
-                      <span className="shrink-0 text-xs text-accent">{isCurrentlyPlaying ? "Playing" : "▶"}</span>
+                      <span className="shrink-0 text-xs text-accent">{isCurrentlyPlaying ? "Playing" : <PlayIconComponent className="h-4 w-4" />}</span>
                     </button>
                   </li>
                 );

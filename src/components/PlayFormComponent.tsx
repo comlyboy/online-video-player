@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
+import { PlayIconComponent } from "@/components/icons/PlayIconComponent";
 import { isPlayableVideoUrl, isPlaylistUrl } from "@/lib/video-url";
 
 interface PlayFormComponentProps {
@@ -59,9 +60,10 @@ export function PlayFormComponent({ onSubmitVideoUrl, onSubmitPlaylistUrl }: Pla
 
       <button
         type="submit"
-        className="rounded-lg bg-accent-strong px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90"
+        className="flex items-center justify-center gap-2 rounded-lg bg-accent-strong px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90"
       >
-        ▶ Play
+        <PlayIconComponent />
+        Play
       </button>
     </form>
   );

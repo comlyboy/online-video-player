@@ -13,6 +13,7 @@ import { WelcomeScreenComponent } from "@/components/WelcomeScreenComponent";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
 import { RecordWatchedVideoOptions } from "@/database/watch-history.db";
 import { WatchSource } from "@/types/watch-history-entry";
+import { useControlDrawerStore } from "@/store/control-drawer-store";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
 
@@ -34,6 +35,7 @@ export function WatchAppComponent() {
 
   const customSites = useCustomStreamingSitesStore((state) => state.customSites);
   const loadCustomSites = useCustomStreamingSitesStore((state) => state.loadCustomSites);
+  const closeControlDrawer = useControlDrawerStore((state) => state.close);
   const loadWatchHistory = useWatchHistoryStore((state) => state.loadHistory);
   const recordWatchedVideoUrl = useWatchHistoryStore((state) => state.recordVideo);
 
@@ -61,6 +63,7 @@ export function WatchAppComponent() {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
     recordWatchedVideoUrl(videoUrl, options);
+    closeControlDrawer();
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
   }
 

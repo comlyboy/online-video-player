@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 
+import { CloseIconComponent } from "@/components/icons/CloseIconComponent";
 import { isPlayableVideoUrl } from "@/lib/video-url";
 import { usePlaylistStore } from "@/store/playlist-store";
 
@@ -61,7 +62,7 @@ export function PlaylistPickerComponent() {
                   aria-label={`Remove playlist ${playlist.name}`}
                   className="shrink-0 py-1 pl-0.5 pr-2.5 transition hover:text-red-400"
                 >
-                  ✕
+                  <CloseIconComponent className="h-3 w-3" />
                 </button>
               </li>
             );

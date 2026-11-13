@@ -1,5 +1,6 @@
 "use client";
 
+import { StopIconComponent } from "@/components/icons/StopIconComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
 import { VideoIdComponent } from "@/components/VideoIdComponent";
 import { buildVideoSummaryParts } from "@/lib/video-metadata";
@@ -66,9 +67,9 @@ export function CurrentlyPlayingComponent({ videoUrl, onStopWatching }: Currentl
           onClick={onStopWatching}
           aria-label="Stop watching"
           title="Stop watching"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-xs text-foreground-muted transition hover:border-red-400 hover:text-red-400"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-foreground transition hover:border-red-400 hover:text-red-400"
         >
-          ■
+          <StopIconComponent className="h-4 w-4" />
         </button>
       </div>
     </DrawerSectionComponent>

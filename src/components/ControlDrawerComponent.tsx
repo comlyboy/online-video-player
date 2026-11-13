@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { CloseIconComponent } from "@/components/icons/CloseIconComponent";
+import { HomeIconComponent } from "@/components/icons/HomeIconComponent";
 import { CurrentlyPlayingComponent } from "@/components/CurrentlyPlayingComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
 import { PlayFormComponent } from "@/components/PlayFormComponent";
@@ -77,20 +79,7 @@ export function ControlDrawerComponent({
               title="Back to welcome screen"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-foreground-muted transition hover:border-accent hover:text-accent"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path d="M3 11l9-8 9 8" />
-                <path d="M5 10v10h5v-6h4v6h5V10" />
-              </svg>
+              <HomeIconComponent />
             </button>
             <h2 className="text-lg font-semibold text-foreground">Controls</h2>
           </div>
@@ -101,9 +90,9 @@ export function ControlDrawerComponent({
               type="button"
               onClick={close}
               aria-label="Close controls"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-sm text-foreground-muted transition hover:border-accent hover:text-accent"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-foreground-muted transition hover:border-accent hover:text-accent"
             >
-              ✕
+              <CloseIconComponent />
             </button>
           </div>
         </div>
