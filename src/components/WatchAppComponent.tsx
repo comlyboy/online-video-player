@@ -56,7 +56,7 @@ export function WatchAppComponent() {
 
   return (
     <div className="relative flex h-full min-h-0 flex-1 flex-col">
-      <div className="relative min-h-0 flex-1">
+      <div className="relative isolate min-h-0 flex-1">
         {activeTabId === "" ? (
           <WelcomeScreenComponent />
         ) : activePlatform ? (

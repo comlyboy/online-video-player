@@ -72,7 +72,7 @@ export function VideoMetadataComponent({ videoUrl }: VideoMetadataComponentProps
   const metadata = isLoading ? null : loadedMetadata.metadata;
 
   return (
-    <section aria-label="Video details" aria-busy={isLoading} className="mt-4 flex flex-col gap-2">
+    <section aria-label="Video details" aria-busy={isLoading} className="mb-4 flex flex-col gap-2">
       <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground-muted">Video details</h3>
 
       {isLoading ? (

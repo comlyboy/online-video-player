@@ -25,7 +25,7 @@ export function ControlDrawerComponent({
       <div
         onClick={close}
         aria-hidden="true"
-        className={`fixed inset-0 z-30 bg-black/60 transition-opacity ${
+        className={`fixed inset-0 z-[2147483646] bg-black/60 transition-opacity ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
@@ -35,7 +35,7 @@ export function ControlDrawerComponent({
         role="dialog"
         aria-modal="true"
         aria-label="Controls"
-        className={`fixed right-0 top-0 z-40 flex h-full w-full max-w-sm flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-[2147483647] flex h-full w-full max-w-sm flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -52,13 +52,6 @@ export function ControlDrawerComponent({
         </div>
 
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
-          <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
-            <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
-
-            <VideoMetadataComponent videoUrl={activeVideoUrl} />
-          </div>
-
           <WatchHistoryListComponent onSelectVideoUrl={onSubmitVideoUrl} />
 
           <div>
@@ -82,6 +75,13 @@ export function ControlDrawerComponent({
           >
             Back to welcome screen
           </button>
+        </div>
+
+        <div className="max-h-[50vh] shrink-0 overflow-y-auto border-t border-border-default p-4">
+          <VideoMetadataComponent videoUrl={activeVideoUrl} />
+
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground-muted">Play from URL</h3>
+          <PlayFormComponent initialVideoUrl={activeVideoUrl} onSubmitVideoUrl={onSubmitVideoUrl} />
         </div>
       </aside>
     </>
