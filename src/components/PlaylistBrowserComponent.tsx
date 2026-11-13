@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
-import { isPlayableVideoUrl } from "@/lib/video-url";
+import { PlaylistPickerComponent } from "@/components/PlaylistPickerComponent";
 import { PlaylistStatus, usePlaylistStore } from "@/store/playlist-store";
 
 const CHANNELS_PER_PAGE = 100;
@@ -15,17 +15,14 @@ interface PlaylistBrowserComponentProps {
 }
 
 export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: PlaylistBrowserComponentProps) {
-  const playlistUrl = usePlaylistStore((state) => state.playlistUrl);
+  const savedPlaylistCount = usePlaylistStore((state) => state.savedPlaylists.length);
   const channels = usePlaylistStore((state) => state.channels);
   const status = usePlaylistStore((state) => state.status);
   const errorMessage = usePlaylistStore((state) => state.errorMessage);
-  const setPlaylistUrl = usePlaylistStore((state) => state.setPlaylistUrl);
-  const loadPlaylist = usePlaylistStore((state) => state.loadPlaylist);
 
   const [searchText, setSearchText] = useState("");
   const [selectedGroup, setSelectedGroup] = useState(ALL_GROUPS_VALUE);
   const [visibleChannelCount, setVisibleChannelCount] = useState(CHANNELS_PER_PAGE);
-  const [validationError, setValidationError] = useState("");
 
   // Browsers block plain http streams on an https page, so those channels can never play there.
   const playableChannels = useMemo(() => {
@@ -51,57 +48,17 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
     });
   }, [playableChannels, searchText, selectedGroup]);
 
-  function handleLoadPlaylist(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!isPlayableVideoUrl(playlistUrl)) {
-      setValidationError("Enter a full playlist URL starting with http:// or https://");
-      return;
-    }
-
-    setValidationError("");
-    setSearchText("");
-    setSelectedGroup(ALL_GROUPS_VALUE);
-    setVisibleChannelCount(CHANNELS_PER_PAGE);
-    void loadPlaylist(playlistUrl.trim());
-  }
-
-  const isLoading = status === PlaylistStatus.LOADING;
   const visibleChannels = matchingChannels.slice(0, visibleChannelCount);
 
   return (
     <DrawerSectionComponent title="Playlist">
-      <form onSubmit={handleLoadPlaylist} className="flex flex-col gap-2">
-        <label htmlFor="playlist-url" className="sr-only">
-          Playlist URL (.m3u)
-        </label>
-        <div className="flex gap-2">
-          <input
-            id="playlist-url"
-            type="url"
-            inputMode="url"
-            placeholder="Paste an .m3u playlist URL…"
-            value={playlistUrl}
-            onChange={(event) => setPlaylistUrl(event.target.value)}
-            aria-invalid={Boolean(validationError)}
-            aria-describedby={validationError ? "playlist-url-error" : undefined}
-            className="min-w-0 flex-1 rounded-lg border border-border-default bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
-          />
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="shrink-0 rounded-lg border border-border-default px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent hover:text-accent disabled:opacity-50"
-          >
-            {isLoading ? "Loading…" : "Load"}
-          </button>
-        </div>
+      <PlaylistPickerComponent />
 
-        {validationError ? (
-          <p id="playlist-url-error" role="alert" className="text-xs text-red-400">
-            {validationError}
-          </p>
-        ) : null}
-      </form>
+      {status === PlaylistStatus.LOADING ? (
+        <p role="status" className="text-xs text-foreground-muted">
+          Loading playlist…
+        </p>
+      ) : null}
 
       {status === PlaylistStatus.ERROR ? (
         <p role="alert" className="text-xs text-red-400">
@@ -199,8 +156,9 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
 
       {status === PlaylistStatus.IDLE ? (
         <p className="text-xs text-foreground-muted">
-          Load an .m3u playlist to browse and play its channels here. Only channels served over https that allow
-          cross-origin requests will play.
+          {savedPlaylistCount > 0
+            ? "Pick a playlist above to load its channels."
+            : "Add an .m3u playlist to browse and play its channels here. Only channels served over https that allow cross-origin requests will play."}
         </p>
       ) : null}
     </DrawerSectionComponent>

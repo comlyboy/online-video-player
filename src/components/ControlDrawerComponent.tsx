@@ -30,14 +30,14 @@ export function ControlDrawerComponent({
 }: ControlDrawerComponentProps) {
   const isOpen = useControlDrawerStore((state) => state.isOpen);
   const close = useControlDrawerStore((state) => state.close);
-  const loadPlaylist = usePlaylistStore((state) => state.loadPlaylist);
+  const addPlaylist = usePlaylistStore((state) => state.addPlaylist);
   const [openQuickSettingsPanel, setOpenQuickSettingsPanel] = useState<QuickSettingsPanel | null>(null);
 
   const [activeSourceTab, setActiveSourceTab] = useState<SourceTab>(SourceTab.VIDEOS);
 
   function handleSubmitPlaylistUrl(playlistUrl: string) {
     setActiveSourceTab(SourceTab.PLAYLIST);
-    void loadPlaylist(playlistUrl);
+    void addPlaylist(playlistUrl);
   }
 
   function toggleQuickSettingsPanel(panel: QuickSettingsPanel) {
@@ -59,7 +59,7 @@ export function ControlDrawerComponent({
         role="dialog"
         aria-modal="true"
         aria-label="Controls"
-        className={`fixed right-0 top-0 z-[2147483647] flex h-full w-full max-w-sm flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-[2147483647] flex h-full w-full max-w-md flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
