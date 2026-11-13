@@ -15,7 +15,7 @@ interface WatchHistoryStore {
   historyEntries: WatchHistoryEntry[];
   metadataLookupUrls: string[];
   loadHistory: () => Promise<void>;
-  recordVideo: (videoUrl: string) => Promise<void>;
+  recordVideo: (videoUrl: string, title?: string) => Promise<void>;
   removeVideo: (videoUrl: string) => Promise<void>;
   clearHistory: () => Promise<void>;
 }
@@ -84,7 +84,7 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
       }
     },
 
-    recordVideo: async (videoUrl) => {
+    recordVideo: async (videoUrl, title) => {
       const existingEntry = get().historyEntries.find((entry) => entry.videoUrl === videoUrl);
       const takenVideoIds = get().historyEntries.map((entry) => entry.id);
       const newVideoId = existingEntry?.id ?? buildUniqueVideoId(Date.now(), takenVideoIds);
@@ -93,11 +93,12 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
         videoUrl,
         watchedAt: Date.now(),
         id: newVideoId,
+        title: title ?? existingEntry?.title,
         metadata: existingEntry?.metadata,
       };
 
       try {
-        recordedEntry = await recordWatchedVideo(videoUrl, newVideoId);
+        recordedEntry = await recordWatchedVideo(videoUrl, newVideoId, title);
       } catch (error) {
         console.warn("Could not save this video to watch history:", error);
       }

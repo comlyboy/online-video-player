@@ -1,3 +1,4 @@
+import { isHlsUrl } from "@/lib/video-url";
 import { VideoMetadata } from "@/types/video-metadata";
 
 const METADATA_TIMEOUT_MS = 10000;
@@ -25,6 +26,12 @@ function readFileName(parsedUrl: URL): string {
 // Reads duration and resolution by letting the browser load only the video's metadata.
 function readPlaybackMetadata(videoUrl: string): Promise<PlaybackMetadata> {
   return new Promise((resolve) => {
+    // A stream has no fixed duration, and most browsers cannot load one in a bare <video>.
+    if (isHlsUrl(videoUrl)) {
+      resolve({ durationSeconds: null, widthPixels: null, heightPixels: null });
+      return;
+    }
+
     const videoElement = document.createElement("video");
     videoElement.preload = "metadata";
     videoElement.muted = true;

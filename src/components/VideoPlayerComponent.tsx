@@ -1,9 +1,11 @@
 "use client";
 
 import Artplayer from "artplayer";
+import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
 
 import { cacheVideoForReuse, getCachedVideoBlob } from "@/database";
+import { isHlsUrl } from "@/lib/video-url";
 import { buildPlaceholderPosterDataUrl } from "@/lib/video-placeholder";
 
 const FALLBACK_ACCENT_COLOR = "#d6922e";
@@ -30,8 +32,11 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
     let artplayerInstance: Artplayer | null = null;
     let cachedObjectUrl: string | null = null;
 
+    const isHlsStream = isHlsUrl(videoUrl);
+
     async function setUpPlayer() {
-      const cachedVideoBlob = await getCachedVideoBlob(videoUrl);
+      // Streams are never cached: playlists are tiny and live channels have no end.
+      const cachedVideoBlob = isHlsStream ? null : await getCachedVideoBlob(videoUrl);
 
       if (isCancelled || !playerContainerRef.current) {
         return;
@@ -42,6 +47,26 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       if (cachedVideoBlob) {
         cachedObjectUrl = URL.createObjectURL(cachedVideoBlob);
         playbackUrl = cachedObjectUrl;
+      }
+
+      // Plays an HLS stream through hls.js, or natively where the browser supports it (Safari).
+      function playHlsStream(videoElement: HTMLVideoElement, streamUrl: string, player: Artplayer) {
+        if (Hls.isSupported()) {
+          const hlsInstance = new Hls();
+          hlsInstance.loadSource(streamUrl);
+          hlsInstance.attachMedia(videoElement);
+          hlsInstance.on(Hls.Events.ERROR, (_event, errorData) => {
+            if (errorData.fatal) {
+              console.error("HLS stream failed:", errorData.details);
+              setHasPlaybackError(true);
+            }
+          });
+          player.on("destroy", () => hlsInstance.destroy());
+        } else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
+          videoElement.src = streamUrl;
+        } else {
+          setHasPlaybackError(true);
+        }
       }
 
       // Screenshots need a CORS-enabled video (otherwise the canvas is tainted). Cached blobs are same-origin.
@@ -59,7 +84,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           autoSize: false,
           autoMini: true,
           // Only offer the button when the canvas can be exported; otherwise ArtPlayer rejects with a SecurityError.
-          screenshot: shouldRequestCors || Boolean(cachedObjectUrl),
+          // HLS plays through MSE blobs, which are same-origin, so it is always exportable.
+          screenshot: shouldRequestCors || Boolean(cachedObjectUrl) || isHlsStream,
           setting: true,
           loop: false,
           flip: true,
@@ -75,7 +101,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           autoPlayback: true,
           airplay: true,
           theme: readAccentColor(),
-          moreVideoAttr: shouldRequestCors ? { crossOrigin: "anonymous" } : {},
+          ...(isHlsStream ? { type: "m3u8", customType: { m3u8: playHlsStream } } : {}),
+          moreVideoAttr: shouldRequestCors && !isHlsStream ? { crossOrigin: "anonymous" } : {},
         });
 
         player.on("video:error", (error) => {
@@ -105,7 +132,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       }
 
       try {
-        artplayerInstance = createPlayer(!cachedObjectUrl);
+        artplayerInstance = createPlayer(!cachedObjectUrl && !isHlsStream);
       } catch (error) {
         console.error("ArtPlayer failed to initialise:", error);
         setHasPlaybackError(true);
@@ -113,7 +140,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
 
       artplayerInstanceRef.current = artplayerInstance;
 
-      if (!cachedVideoBlob) {
+      if (!cachedVideoBlob && !isHlsStream) {
         void cacheVideoForReuse(videoUrl);
       }
     }

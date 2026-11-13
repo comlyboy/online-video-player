@@ -19,7 +19,7 @@ export function CurrentlyPlayingComponent({ videoUrl, onStopWatching }: Currentl
       {videoUrl ? (
         <div className="flex flex-col gap-3 rounded-xl border border-accent/40 bg-accent-soft p-3.5">
           <p className="truncate text-sm font-semibold text-foreground" title={videoUrl}>
-            {entry?.metadata?.fileName ?? videoUrl}
+            {entry?.title ?? entry?.metadata?.fileName ?? videoUrl}
           </p>
           <VideoIdComponent videoId={entry?.id} />
           <VideoMetadataComponent metadata={entry?.metadata} isLoading={isLookingUp || !entry} />

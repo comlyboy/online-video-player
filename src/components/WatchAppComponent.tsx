@@ -55,10 +55,10 @@ export function WatchAppComponent() {
     goToWelcome();
   }
 
-  function handleSubmitVideoUrl(videoUrl: string) {
+  function handleSubmitVideoUrl(videoUrl: string, title?: string) {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
-    recordWatchedVideoUrl(videoUrl);
+    recordWatchedVideoUrl(videoUrl, title);
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
   }
 

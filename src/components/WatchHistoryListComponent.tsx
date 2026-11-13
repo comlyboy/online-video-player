@@ -70,7 +70,7 @@ export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: 
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
                     </svg>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm text-foreground">{entry.metadata?.fileName ?? entry.videoUrl}</span>
+                      <span className="block truncate text-sm text-foreground">{entry.title ?? entry.metadata?.fileName ?? entry.videoUrl}</span>
                       <span className="block truncate text-[11px] text-foreground-muted">
                         {entry.metadata?.hostName ?? readHostName(entry.videoUrl)}
                       </span>
@@ -85,7 +85,7 @@ export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: 
                     <button
                       type="button"
                       onClick={() => onSelectVideoUrl(entry.videoUrl)}
-                      aria-label={`Play ${entry.metadata?.fileName ?? entry.videoUrl}`}
+                      aria-label={`Play ${entry.title ?? entry.metadata?.fileName ?? entry.videoUrl}`}
                       className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-strong text-xs text-background transition hover:opacity-90"
                     >
                       ▶

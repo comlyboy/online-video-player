@@ -12,12 +12,13 @@ function getDbApi() {
   return dbApi;
 }
 
-export async function recordWatchedVideo(videoUrl: string, newVideoId: string) {
+export async function recordWatchedVideo(videoUrl: string, newVideoId: string, title?: string) {
   const existingEntry = await getDbApi().get<WatchHistoryEntry>({ key: videoUrl, storeName: STORE_NAME });
   const entry: WatchHistoryEntry = {
     videoUrl,
     watchedAt: Date.now(),
     id: existingEntry?.id ?? newVideoId,
+    title: title ?? existingEntry?.title,
     metadata: existingEntry?.metadata,
   };
   await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: entry });

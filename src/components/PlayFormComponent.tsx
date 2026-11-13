@@ -2,13 +2,14 @@
 
 import { FormEvent, useState } from "react";
 
-import { isPlayableVideoUrl } from "@/lib/video-url";
+import { isPlayableVideoUrl, isPlaylistUrl } from "@/lib/video-url";
 
 interface PlayFormComponentProps {
   onSubmitVideoUrl: (videoUrl: string) => void;
+  onSubmitPlaylistUrl: (playlistUrl: string) => void;
 }
 
-export function PlayFormComponent({ onSubmitVideoUrl }: PlayFormComponentProps) {
+export function PlayFormComponent({ onSubmitVideoUrl, onSubmitPlaylistUrl }: PlayFormComponentProps) {
   const [videoUrlInput, setVideoUrlInput] = useState("");
   const [validationError, setValidationError] = useState("");
 
@@ -21,7 +22,14 @@ export function PlayFormComponent({ onSubmitVideoUrl }: PlayFormComponentProps) 
     }
 
     setValidationError("");
-    onSubmitVideoUrl(videoUrlInput.trim());
+    const trimmedUrl = videoUrlInput.trim();
+
+    // A .m3u link is a channel list: it goes to the playlist section instead of the player.
+    if (isPlaylistUrl(trimmedUrl)) {
+      onSubmitPlaylistUrl(trimmedUrl);
+    } else {
+      onSubmitVideoUrl(trimmedUrl);
+    }
     setVideoUrlInput("");
   }
 

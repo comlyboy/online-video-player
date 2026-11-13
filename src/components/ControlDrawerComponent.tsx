@@ -2,14 +2,16 @@
 
 import { CurrentlyPlayingComponent } from "@/components/CurrentlyPlayingComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
-import { ColorSchemeSwitcherComponent } from "@/components/ColorSchemeSwitcherComponent";
 import { PlayFormComponent } from "@/components/PlayFormComponent";
+import { PlaylistBrowserComponent } from "@/components/PlaylistBrowserComponent";
+import { QuickSettingsComponent } from "@/components/QuickSettingsComponent";
 import { WatchHistoryListComponent } from "@/components/WatchHistoryListComponent";
+import { usePlaylistStore } from "@/store/playlist-store";
 import { useControlDrawerStore } from "@/store/control-drawer-store";
 
 interface ControlDrawerComponentProps {
   activeVideoUrl: string;
-  onSubmitVideoUrl: (videoUrl: string) => void;
+  onSubmitVideoUrl: (videoUrl: string, title?: string) => void;
   onGoToWelcome: () => void;
   onStopWatching: () => void;
 }
@@ -22,6 +24,7 @@ export function ControlDrawerComponent({
 }: ControlDrawerComponentProps) {
   const isOpen = useControlDrawerStore((state) => state.isOpen);
   const close = useControlDrawerStore((state) => state.close);
+  const loadPlaylist = usePlaylistStore((state) => state.loadPlaylist);
 
   return (
     <>
@@ -42,37 +45,26 @@ export function ControlDrawerComponent({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-border-default px-5 py-4">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">Now Screening</p>
-            <h2 className="mt-0.5 text-base font-semibold text-foreground">Controls</h2>
-          </div>
+        <div className="flex shrink-0 items-center justify-between border-b border-border-default px-4 py-2">
+          <h2 className="text-sm font-semibold text-foreground">Controls</h2>
           <button
             type="button"
             onClick={close}
             aria-label="Close controls"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-border-default text-foreground-muted transition hover:border-accent hover:text-accent"
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-border-default text-xs text-foreground-muted transition hover:border-accent hover:text-accent"
           >
             ✕
           </button>
         </div>
 
         <div className="flex flex-1 flex-col gap-7 overflow-y-auto p-5">
+          <QuickSettingsComponent />
+
           <CurrentlyPlayingComponent videoUrl={activeVideoUrl} onStopWatching={onStopWatching} />
 
+          <PlaylistBrowserComponent activeVideoUrl={activeVideoUrl} onSelectChannel={onSubmitVideoUrl} />
+
           <WatchHistoryListComponent activeVideoUrl={activeVideoUrl} onSelectVideoUrl={onSubmitVideoUrl} />
-
-          <DrawerSectionComponent title="Appearance">
-            <ColorSchemeSwitcherComponent />
-          </DrawerSectionComponent>
-
-          <DrawerSectionComponent title="Accessibility">
-            <p className="text-xs leading-relaxed text-foreground-muted">
-              For automatic captions on any video playing here, turn on your browser&apos;s built-in live
-              captioning (e.g. Chrome or Edge: Settings → Accessibility → Live Caption). This app can&apos;t
-              switch it on for you, it&apos;s a browser-level feature that works on whatever is playing.
-            </p>
-          </DrawerSectionComponent>
 
           <button
             type="button"
@@ -85,7 +77,7 @@ export function ControlDrawerComponent({
 
         <div className="shrink-0 border-t border-border-default bg-background-card p-5">
           <DrawerSectionComponent title="Play from URL">
-            <PlayFormComponent onSubmitVideoUrl={onSubmitVideoUrl} />
+            <PlayFormComponent onSubmitVideoUrl={onSubmitVideoUrl} onSubmitPlaylistUrl={loadPlaylist} />
           </DrawerSectionComponent>
         </div>
       </aside>
