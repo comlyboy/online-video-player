@@ -3,15 +3,17 @@
 import { useState } from "react";
 
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
+import { VideoIdComponent } from "@/components/VideoIdComponent";
 import { VideoMetadataComponent } from "@/components/VideoMetadataComponent";
 import { readHostName } from "@/lib/video-url";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
 
 interface WatchHistoryListComponentProps {
+  activeVideoUrl: string;
   onSelectVideoUrl: (videoUrl: string) => void;
 }
 
-export function WatchHistoryListComponent({ onSelectVideoUrl }: WatchHistoryListComponentProps) {
+export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: WatchHistoryListComponentProps) {
   const historyEntries = useWatchHistoryStore((state) => state.historyEntries);
   const metadataLookupUrls = useWatchHistoryStore((state) => state.metadataLookupUrls);
   const removeVideo = useWatchHistoryStore((state) => state.removeVideo);
@@ -42,6 +44,7 @@ export function WatchHistoryListComponent({ onSelectVideoUrl }: WatchHistoryList
         <ul className="flex flex-col gap-2">
           {historyEntries.map((entry, index) => {
             const isExpanded = expandedVideoUrl === entry.videoUrl;
+            const isCurrentlyPlaying = entry.videoUrl === activeVideoUrl;
             const panelId = `history-panel-${index}`;
 
             return (
@@ -74,14 +77,20 @@ export function WatchHistoryListComponent({ onSelectVideoUrl }: WatchHistoryList
                     </span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => onSelectVideoUrl(entry.videoUrl)}
-                    aria-label={`Play ${entry.metadata?.fileName ?? entry.videoUrl}`}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-strong text-xs text-background transition hover:opacity-90"
-                  >
-                    ▶
-                  </button>
+                  {isCurrentlyPlaying ? (
+                    <span className="shrink-0 rounded-full border border-accent/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+                      Playing
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onSelectVideoUrl(entry.videoUrl)}
+                      aria-label={`Play ${entry.metadata?.fileName ?? entry.videoUrl}`}
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-strong text-xs text-background transition hover:opacity-90"
+                    >
+                      ▶
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => removeVideo(entry.videoUrl)}
@@ -93,6 +102,7 @@ export function WatchHistoryListComponent({ onSelectVideoUrl }: WatchHistoryList
                 </div>
 
                 <div id={panelId} role="region" hidden={!isExpanded} className="border-t border-border-default px-3 py-3">
+                  <div className="mb-2"><VideoIdComponent videoId={entry.id} /></div>
                   <VideoMetadataComponent
                     metadata={entry.metadata}
                     isLoading={metadataLookupUrls.includes(entry.videoUrl)}

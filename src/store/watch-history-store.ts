@@ -5,9 +5,10 @@ import {
   getWatchHistory,
   recordWatchedVideo,
   removeWatchedVideo,
-  saveWatchedVideoMetadata,
+  updateWatchedVideo,
 } from "@/database";
 import { loadVideoMetadata } from "@/lib/video-metadata";
+import { buildUniqueVideoId } from "@/lib/video-id";
 import { WatchHistoryEntry } from "@/types/watch-history-entry";
 
 interface WatchHistoryStore {
@@ -17,6 +18,24 @@ interface WatchHistoryStore {
   recordVideo: (videoUrl: string) => Promise<void>;
   removeVideo: (videoUrl: string) => Promise<void>;
   clearHistory: () => Promise<void>;
+}
+
+function assignMissingVideoIds(historyEntries: WatchHistoryEntry[]): WatchHistoryEntry[] {
+  const takenVideoIds = historyEntries.map((entry) => entry.id);
+
+  // Oldest first, so the earliest video keeps the ID closest to when it was watched.
+  const entriesOldestFirst = [...historyEntries].sort((first, second) => first.watchedAt - second.watchedAt);
+  const assignedIds = new Map<string, string>();
+
+  for (const entry of entriesOldestFirst) {
+    if (!entry.id) {
+      const newVideoId = buildUniqueVideoId(entry.watchedAt, takenVideoIds);
+      takenVideoIds.push(newVideoId);
+      assignedIds.set(entry.videoUrl, newVideoId);
+    }
+  }
+
+  return historyEntries.map((entry) => (entry.id ? entry : { ...entry, id: assignedIds.get(entry.videoUrl) }));
 }
 
 // Browser storage can be unavailable (private mode, blocked site data, quota exceeded).
@@ -35,7 +54,7 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
           entry.videoUrl === videoUrl ? { ...entry, metadata } : entry,
         ),
       });
-      await saveWatchedVideoMetadata(videoUrl, metadata);
+      await updateWatchedVideo(videoUrl, { metadata });
     } catch (error) {
       console.debug("Could not look up or save video metadata:", error);
     } finally {
@@ -50,26 +69,43 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
     loadHistory: async () => {
       try {
         const historyEntries = await getWatchHistory();
-        set({ historyEntries });
+        const entriesWithIds = assignMissingVideoIds(historyEntries);
+        set({ historyEntries: entriesWithIds });
+
+        // Entries saved before IDs existed get one now and keep it from then on.
+        for (const entry of entriesWithIds) {
+          const originalEntry = historyEntries.find((candidate) => candidate.videoUrl === entry.videoUrl);
+          if (!originalEntry?.id) {
+            await updateWatchedVideo(entry.videoUrl, { id: entry.id });
+          }
+        }
       } catch (error) {
         console.warn("Could not load watch history:", error);
       }
     },
 
     recordVideo: async (videoUrl) => {
+      const existingEntry = get().historyEntries.find((entry) => entry.videoUrl === videoUrl);
+      const takenVideoIds = get().historyEntries.map((entry) => entry.id);
+      const newVideoId = existingEntry?.id ?? buildUniqueVideoId(Date.now(), takenVideoIds);
+
+      let recordedEntry: WatchHistoryEntry = {
+        videoUrl,
+        watchedAt: Date.now(),
+        id: newVideoId,
+        metadata: existingEntry?.metadata,
+      };
+
       try {
-        await recordWatchedVideo(videoUrl);
+        recordedEntry = await recordWatchedVideo(videoUrl, newVideoId);
       } catch (error) {
         console.warn("Could not save this video to watch history:", error);
       }
 
-      const existingEntry = get().historyEntries.find((entry) => entry.videoUrl === videoUrl);
       const remainingEntries = get().historyEntries.filter((entry) => entry.videoUrl !== videoUrl);
-      set({
-        historyEntries: [{ videoUrl, watchedAt: Date.now(), metadata: existingEntry?.metadata }, ...remainingEntries],
-      });
+      set({ historyEntries: [recordedEntry, ...remainingEntries] });
 
-      if (!existingEntry?.metadata) {
+      if (!recordedEntry.metadata) {
         void lookUpMetadata(videoUrl);
       }
     },

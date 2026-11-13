@@ -1,5 +1,4 @@
 import { initIndexDatabase } from "@/database/db";
-import { VideoMetadata } from "@/types/video-metadata";
 import { WatchHistoryEntry } from "@/types/watch-history-entry";
 
 const STORE_NAME = "watch-history";
@@ -13,18 +12,24 @@ function getDbApi() {
   return dbApi;
 }
 
-export async function recordWatchedVideo(videoUrl: string) {
+export async function recordWatchedVideo(videoUrl: string, newVideoId: string) {
   const existingEntry = await getDbApi().get<WatchHistoryEntry>({ key: videoUrl, storeName: STORE_NAME });
-  const entry: WatchHistoryEntry = { videoUrl, watchedAt: Date.now(), metadata: existingEntry?.metadata };
+  const entry: WatchHistoryEntry = {
+    videoUrl,
+    watchedAt: Date.now(),
+    id: existingEntry?.id ?? newVideoId,
+    metadata: existingEntry?.metadata,
+  };
   await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: entry });
+  return entry;
 }
 
-export async function saveWatchedVideoMetadata(videoUrl: string, metadata: VideoMetadata) {
+export async function updateWatchedVideo(videoUrl: string, changes: Pick<WatchHistoryEntry, "id" | "metadata">) {
   const existingEntry = await getDbApi().get<WatchHistoryEntry>({ key: videoUrl, storeName: STORE_NAME });
   if (!existingEntry) {
     return;
   }
-  await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: { ...existingEntry, metadata } });
+  await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: { ...existingEntry, ...changes } });
 }
 
 export async function removeWatchedVideo(videoUrl: string) {

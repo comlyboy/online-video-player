@@ -1,6 +1,7 @@
 "use client";
 
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
+import { VideoIdComponent } from "@/components/VideoIdComponent";
 import { VideoMetadataComponent } from "@/components/VideoMetadataComponent";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
 
@@ -20,6 +21,7 @@ export function CurrentlyPlayingComponent({ videoUrl, onStopWatching }: Currentl
           <p className="truncate text-sm font-semibold text-foreground" title={videoUrl}>
             {entry?.metadata?.fileName ?? videoUrl}
           </p>
+          <VideoIdComponent videoId={entry?.id} />
           <VideoMetadataComponent metadata={entry?.metadata} isLoading={isLookingUp || !entry} />
           <button
             type="button"

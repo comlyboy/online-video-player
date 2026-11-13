@@ -60,7 +60,7 @@ export function ControlDrawerComponent({
         <div className="flex flex-1 flex-col gap-7 overflow-y-auto p-5">
           <CurrentlyPlayingComponent videoUrl={activeVideoUrl} onStopWatching={onStopWatching} />
 
-          <WatchHistoryListComponent onSelectVideoUrl={onSubmitVideoUrl} />
+          <WatchHistoryListComponent activeVideoUrl={activeVideoUrl} onSelectVideoUrl={onSubmitVideoUrl} />
 
           <DrawerSectionComponent title="Appearance">
             <ColorSchemeSwitcherComponent />
