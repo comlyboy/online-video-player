@@ -69,7 +69,31 @@ export function ControlDrawerComponent({
         }`}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-border-default px-4 py-2">
-          <h2 className="text-sm font-semibold text-foreground">Controls</h2>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onGoToWelcome}
+              aria-label="Back to welcome screen"
+              title="Back to welcome screen"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-foreground-muted transition hover:border-accent hover:text-accent"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M3 11l9-8 9 8" />
+                <path d="M5 10v10h5v-6h4v6h5V10" />
+              </svg>
+            </button>
+            <h2 className="text-lg font-semibold text-foreground">Controls</h2>
+          </div>
 
           <div className="flex items-center gap-2">
             <QuickSettingsButtonsComponent openPanel={openQuickSettingsPanel} onTogglePanel={toggleQuickSettingsPanel} />
@@ -77,7 +101,7 @@ export function ControlDrawerComponent({
               type="button"
               onClick={close}
               aria-label="Close controls"
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border-default text-xs text-foreground-muted transition hover:border-accent hover:text-accent"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-default text-sm text-foreground-muted transition hover:border-accent hover:text-accent"
             >
               ✕
             </button>
@@ -132,14 +156,6 @@ export function ControlDrawerComponent({
               </div>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={onGoToWelcome}
-            className="mt-auto rounded-lg border border-border-default px-3 py-2 text-sm text-foreground-muted transition hover:border-accent hover:text-accent"
-          >
-            Back to welcome screen
-          </button>
         </div>
       </aside>
     </>

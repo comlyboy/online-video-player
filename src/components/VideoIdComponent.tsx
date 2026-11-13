@@ -8,7 +8,7 @@ export function VideoIdComponent({ videoId }: VideoIdComponentProps) {
   }
 
   return (
-    <p className="font-mono text-[11px] tracking-wide text-accent">
+    <p className="font-mono text-[10px] leading-snug tracking-wide text-accent">
       <span className="text-foreground-muted">ID </span>
       {videoId}
     </p>

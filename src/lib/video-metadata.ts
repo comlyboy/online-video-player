@@ -115,6 +115,11 @@ export function formatFileSize(sizeBytes: number): string {
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
+// For a stream, the size header describes the tiny playlist file, not the video, so it is never shown.
+function hasMeaningfulSize(metadata: VideoMetadata): boolean {
+  return metadata.sizeBytes !== null && !/\.m3u8?$/i.test(metadata.fileName);
+}
+
 export interface VideoMetadataRow {
   label: string;
   value: string;
@@ -135,9 +140,26 @@ export function buildVideoMetadataRows(metadata: VideoMetadata): VideoMetadataRo
   if (metadata.contentType) {
     rows.push({ label: "Type", value: metadata.contentType });
   }
-  if (metadata.sizeBytes !== null) {
+  if (metadata.sizeBytes !== null && hasMeaningfulSize(metadata)) {
     rows.push({ label: "Size", value: formatFileSize(metadata.sizeBytes) });
   }
 
   return rows;
+}
+
+// A short one-line summary (source, length, resolution, size) for tight spaces.
+export function buildVideoSummaryParts(metadata: VideoMetadata): string[] {
+  const summaryParts: string[] = [metadata.hostName];
+
+  if (metadata.durationSeconds !== null) {
+    summaryParts.push(formatDuration(metadata.durationSeconds));
+  }
+  if (metadata.widthPixels !== null && metadata.heightPixels !== null) {
+    summaryParts.push(`${metadata.widthPixels}×${metadata.heightPixels}`);
+  }
+  if (metadata.sizeBytes !== null && hasMeaningfulSize(metadata)) {
+    summaryParts.push(formatFileSize(metadata.sizeBytes));
+  }
+
+  return summaryParts;
 }
