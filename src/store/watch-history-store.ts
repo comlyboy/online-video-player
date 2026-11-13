@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 import {
-  clearWatchHistory,
   getWatchHistory,
   recordWatchedVideo,
   removeWatchedVideo,
@@ -9,15 +8,16 @@ import {
 } from "@/database";
 import { loadVideoMetadata } from "@/lib/video-metadata";
 import { buildUniqueVideoId } from "@/lib/video-id";
-import { WatchHistoryEntry } from "@/types/watch-history-entry";
+import { RecordWatchedVideoOptions } from "@/database/watch-history.db";
+import { WatchHistoryEntry, WatchSource } from "@/types/watch-history-entry";
 
 interface WatchHistoryStore {
   historyEntries: WatchHistoryEntry[];
   metadataLookupUrls: string[];
   loadHistory: () => Promise<void>;
-  recordVideo: (videoUrl: string, title?: string) => Promise<void>;
+  recordVideo: (videoUrl: string, options?: RecordWatchedVideoOptions) => Promise<void>;
   removeVideo: (videoUrl: string) => Promise<void>;
-  clearHistory: () => Promise<void>;
+  clearHistory: (source: WatchSource) => Promise<void>;
 }
 
 function assignMissingVideoIds(historyEntries: WatchHistoryEntry[]): WatchHistoryEntry[] {
@@ -84,7 +84,7 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
       }
     },
 
-    recordVideo: async (videoUrl, title) => {
+    recordVideo: async (videoUrl, options = {}) => {
       const existingEntry = get().historyEntries.find((entry) => entry.videoUrl === videoUrl);
       const takenVideoIds = get().historyEntries.map((entry) => entry.id);
       const newVideoId = existingEntry?.id ?? buildUniqueVideoId(Date.now(), takenVideoIds);
@@ -93,12 +93,13 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
         videoUrl,
         watchedAt: Date.now(),
         id: newVideoId,
-        title: title ?? existingEntry?.title,
+        title: options.title ?? existingEntry?.title,
+        source: options.source ?? existingEntry?.source,
         metadata: existingEntry?.metadata,
       };
 
       try {
-        recordedEntry = await recordWatchedVideo(videoUrl, newVideoId, title);
+        recordedEntry = await recordWatchedVideo(videoUrl, newVideoId, options);
       } catch (error) {
         console.warn("Could not save this video to watch history:", error);
       }
@@ -120,13 +121,20 @@ export const useWatchHistoryStore = create<WatchHistoryStore>((set, get) => {
       set({ historyEntries: get().historyEntries.filter((entry) => entry.videoUrl !== videoUrl) });
     },
 
-    clearHistory: async () => {
-      try {
-        await clearWatchHistory();
-      } catch (error) {
-        console.warn("Could not clear watch history:", error);
+    // Only clears one list (videos or playlist channels), never the other.
+    clearHistory: async (source) => {
+      const entriesToClear = get().historyEntries.filter((entry) => (entry.source ?? WatchSource.VIDEO) === source);
+
+      for (const entry of entriesToClear) {
+        try {
+          await removeWatchedVideo(entry.videoUrl);
+        } catch (error) {
+          console.warn("Could not remove a video from watch history:", error);
+        }
       }
-      set({ historyEntries: [] });
+
+      const clearedUrls = new Set(entriesToClear.map((entry) => entry.videoUrl));
+      set({ historyEntries: get().historyEntries.filter((entry) => !clearedUrls.has(entry.videoUrl)) });
     },
   };
 });

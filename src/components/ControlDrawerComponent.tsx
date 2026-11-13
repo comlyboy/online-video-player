@@ -10,6 +10,7 @@ import { QuickSettingsButtonsComponent } from "@/components/QuickSettingsButtons
 import { QuickSettingsPanelComponent } from "@/components/QuickSettingsPanelComponent";
 import { SourceTabBarComponent } from "@/components/SourceTabBarComponent";
 import { WatchHistoryListComponent } from "@/components/WatchHistoryListComponent";
+import { WatchSource } from "@/types/watch-history-entry";
 import { usePlaylistStore } from "@/store/playlist-store";
 import { QuickSettingsPanel } from "@/lib/quick-settings-panel";
 import { buildSourcePanelId, buildSourceTabId, SourceTab } from "@/lib/source-tab";
@@ -17,7 +18,9 @@ import { useControlDrawerStore } from "@/store/control-drawer-store";
 
 interface ControlDrawerComponentProps {
   activeVideoUrl: string;
-  onSubmitVideoUrl: (videoUrl: string, title?: string) => void;
+  onSubmitVideoUrl: (videoUrl: string) => void;
+  onReplayVideoUrl: (videoUrl: string) => void;
+  onSelectChannel: (channelUrl: string, channelName: string) => void;
   onGoToWelcome: () => void;
   onStopWatching: () => void;
 }
@@ -25,6 +28,8 @@ interface ControlDrawerComponentProps {
 export function ControlDrawerComponent({
   activeVideoUrl,
   onSubmitVideoUrl,
+  onReplayVideoUrl,
+  onSelectChannel,
   onGoToWelcome,
   onStopWatching,
 }: ControlDrawerComponentProps) {
@@ -93,7 +98,19 @@ export function ControlDrawerComponent({
               aria-labelledby={buildSourceTabId(SourceTab.VIDEOS)}
               hidden={activeSourceTab !== SourceTab.VIDEOS}
             >
-              <WatchHistoryListComponent activeVideoUrl={activeVideoUrl} onSelectVideoUrl={onSubmitVideoUrl} />
+              <div className="flex flex-col gap-7">
+                <DrawerSectionComponent title="Play from URL">
+                  <PlayFormComponent onSubmitVideoUrl={onSubmitVideoUrl} onSubmitPlaylistUrl={handleSubmitPlaylistUrl} />
+                </DrawerSectionComponent>
+
+                <WatchHistoryListComponent
+                  source={WatchSource.VIDEO}
+                  title="Recently watched"
+                  emptyMessage="Videos you play from a URL will show up here."
+                  activeVideoUrl={activeVideoUrl}
+                  onSelectVideoUrl={onReplayVideoUrl}
+                />
+              </div>
             </div>
 
             <div
@@ -102,7 +119,17 @@ export function ControlDrawerComponent({
               aria-labelledby={buildSourceTabId(SourceTab.PLAYLIST)}
               hidden={activeSourceTab !== SourceTab.PLAYLIST}
             >
-              <PlaylistBrowserComponent activeVideoUrl={activeVideoUrl} onSelectChannel={onSubmitVideoUrl} />
+              <div className="flex flex-col gap-7">
+                <PlaylistBrowserComponent activeVideoUrl={activeVideoUrl} onSelectChannel={onSelectChannel} />
+
+                <WatchHistoryListComponent
+                  source={WatchSource.PLAYLIST}
+                  title="Recently played"
+                  emptyMessage="Channels you play from a playlist will show up here."
+                  activeVideoUrl={activeVideoUrl}
+                  onSelectVideoUrl={onReplayVideoUrl}
+                />
+              </div>
             </div>
           </div>
 
@@ -113,12 +140,6 @@ export function ControlDrawerComponent({
           >
             Back to welcome screen
           </button>
-        </div>
-
-        <div className="shrink-0 border-t border-border-default bg-background-card p-5">
-          <DrawerSectionComponent title="Play from URL">
-            <PlayFormComponent onSubmitVideoUrl={onSubmitVideoUrl} onSubmitPlaylistUrl={handleSubmitPlaylistUrl} />
-          </DrawerSectionComponent>
         </div>
       </aside>
     </>

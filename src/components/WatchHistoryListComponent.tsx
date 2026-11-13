@@ -1,20 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
 import { VideoIdComponent } from "@/components/VideoIdComponent";
 import { VideoMetadataComponent } from "@/components/VideoMetadataComponent";
 import { readHostName } from "@/lib/video-url";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
+import { WatchSource } from "@/types/watch-history-entry";
 
 interface WatchHistoryListComponentProps {
+  source: WatchSource;
+  title: string;
+  emptyMessage: string;
   activeVideoUrl: string;
   onSelectVideoUrl: (videoUrl: string) => void;
 }
 
-export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: WatchHistoryListComponentProps) {
-  const historyEntries = useWatchHistoryStore((state) => state.historyEntries);
+export function WatchHistoryListComponent({
+  source,
+  title,
+  emptyMessage,
+  activeVideoUrl,
+  onSelectVideoUrl,
+}: WatchHistoryListComponentProps) {
+  const allHistoryEntries = useWatchHistoryStore((state) => state.historyEntries);
+  const historyEntries = allHistoryEntries.filter((entry) => (entry.source ?? WatchSource.VIDEO) === source);
+  const listId = useId();
   const metadataLookupUrls = useWatchHistoryStore((state) => state.metadataLookupUrls);
   const removeVideo = useWatchHistoryStore((state) => state.removeVideo);
   const clearHistory = useWatchHistoryStore((state) => state.clearHistory);
@@ -29,7 +41,7 @@ export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: 
     historyEntries.length > 0 ? (
       <button
         type="button"
-        onClick={() => clearHistory()}
+        onClick={() => clearHistory(source)}
         className="text-xs text-foreground-muted transition hover:text-accent"
       >
         Clear
@@ -37,15 +49,15 @@ export function WatchHistoryListComponent({ activeVideoUrl, onSelectVideoUrl }: 
     ) : null;
 
   return (
-    <DrawerSectionComponent title="Recently watched" action={clearButton}>
+    <DrawerSectionComponent title={title} action={clearButton}>
       {historyEntries.length === 0 ? (
-        <p className="text-xs text-foreground-muted">Videos you play from a URL will show up here.</p>
+        <p className="text-xs text-foreground-muted">{emptyMessage}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {historyEntries.map((entry, index) => {
             const isExpanded = expandedVideoUrl === entry.videoUrl;
             const isCurrentlyPlaying = entry.videoUrl === activeVideoUrl;
-            const panelId = `history-panel-${index}`;
+            const panelId = `${listId}-panel-${index}`;
 
             return (
               <li key={entry.videoUrl} className="overflow-hidden rounded-xl border border-border-default bg-background-card">

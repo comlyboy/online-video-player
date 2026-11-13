@@ -1,7 +1,12 @@
 import { initIndexDatabase } from "@/database/db";
-import { WatchHistoryEntry } from "@/types/watch-history-entry";
+import { WatchHistoryEntry, WatchSource } from "@/types/watch-history-entry";
 
 const STORE_NAME = "watch-history";
+
+export interface RecordWatchedVideoOptions {
+  title?: string;
+  source?: WatchSource;
+}
 
 let dbApi: ReturnType<typeof initIndexDatabase> | undefined;
 
@@ -12,13 +17,14 @@ function getDbApi() {
   return dbApi;
 }
 
-export async function recordWatchedVideo(videoUrl: string, newVideoId: string, title?: string) {
+export async function recordWatchedVideo(videoUrl: string, newVideoId: string, options: RecordWatchedVideoOptions = {}) {
   const existingEntry = await getDbApi().get<WatchHistoryEntry>({ key: videoUrl, storeName: STORE_NAME });
   const entry: WatchHistoryEntry = {
     videoUrl,
     watchedAt: Date.now(),
     id: existingEntry?.id ?? newVideoId,
-    title: title ?? existingEntry?.title,
+    title: options.title ?? existingEntry?.title,
+    source: options.source ?? existingEntry?.source,
     metadata: existingEntry?.metadata,
   };
   await getDbApi().put({ key: videoUrl, storeName: STORE_NAME, data: entry });

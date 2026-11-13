@@ -11,6 +11,8 @@ import { SourceBadgeComponent } from "@/components/SourceBadgeComponent";
 import { VideoPlayerErrorBoundaryComponent } from "@/components/VideoPlayerErrorBoundaryComponent";
 import { WelcomeScreenComponent } from "@/components/WelcomeScreenComponent";
 import { CUSTOM_URL_TAB_ID } from "@/lib/watch-tabs";
+import { RecordWatchedVideoOptions } from "@/database/watch-history.db";
+import { WatchSource } from "@/types/watch-history-entry";
 import { useCustomStreamingSitesStore } from "@/store/custom-streaming-sites-store";
 import { useWatchHistoryStore } from "@/store/watch-history-store";
 
@@ -55,11 +57,26 @@ export function WatchAppComponent() {
     goToWelcome();
   }
 
-  function handleSubmitVideoUrl(videoUrl: string, title?: string) {
+  function startPlaying(videoUrl: string, options: RecordWatchedVideoOptions = {}) {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
-    recordWatchedVideoUrl(videoUrl, title);
+    recordWatchedVideoUrl(videoUrl, options);
     router.replace(`/?tab=${CUSTOM_URL_TAB_ID}&url=${encodeURIComponent(videoUrl)}`);
+  }
+
+  // From the URL form: a plain video.
+  function handleSubmitVideoUrl(videoUrl: string) {
+    startPlaying(videoUrl, { source: WatchSource.VIDEO });
+  }
+
+  // From a history list: keeps whichever list the video already belongs to.
+  function handleReplayVideoUrl(videoUrl: string) {
+    startPlaying(videoUrl);
+  }
+
+  // From a playlist: tracked in the playlist's own list, not among the videos.
+  function handleSelectChannel(channelUrl: string, channelName: string) {
+    startPlaying(channelUrl, { title: channelName, source: WatchSource.PLAYLIST });
   }
 
   const activePlatform = customSites.find((platform) => platform.id === activeTabId);
@@ -90,6 +107,8 @@ export function WatchAppComponent() {
       <ControlDrawerComponent
         activeVideoUrl={activeVideoUrl}
         onSubmitVideoUrl={handleSubmitVideoUrl}
+        onReplayVideoUrl={handleReplayVideoUrl}
+        onSelectChannel={handleSelectChannel}
         onGoToWelcome={goToWelcome}
         onStopWatching={stopWatching}
       />
