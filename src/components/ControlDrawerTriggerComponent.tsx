@@ -13,7 +13,8 @@ export function ControlDrawerTriggerComponent() {
       aria-expanded={isOpen}
       aria-controls="control-drawer"
       aria-label="Open controls"
-      className={`fixed bottom-20 right-6 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-accent-strong text-background shadow-2xl transition hover:opacity-90 ${
+      title="Open controls"
+      className={`fixed bottom-20 right-6 z-20 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-accent-strong text-background shadow-2xl ring-4 ring-accent/25 transition duration-150 hover:scale-110 hover:ring-8 hover:ring-accent/30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent active:scale-95 ${
         isOpen ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >

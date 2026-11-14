@@ -127,3 +127,11 @@ body {
 .art-video-player .art-controls .art-control-playAndPause .art-icon svg {
   fill: var(--art-theme);
 }
+
+/* Tailwind v4 resets buttons to the default arrow cursor; show the pointer on anything clickable. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}

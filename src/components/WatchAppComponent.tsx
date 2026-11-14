@@ -60,6 +60,13 @@ export function WatchAppComponent() {
     goToWelcome();
   }
 
+  // Removing the video that is playing from a list stops it and returns to the welcome screen.
+  function handleVideosRemoved(removedVideoUrls: string[]) {
+    if (activeVideoUrl && removedVideoUrls.includes(activeVideoUrl)) {
+      stopWatching();
+    }
+  }
+
   function startPlaying(videoUrl: string, options: RecordWatchedVideoOptions = {}) {
     setActiveTabId(CUSTOM_URL_TAB_ID);
     setActiveVideoUrl(videoUrl);
@@ -119,6 +126,7 @@ export function WatchAppComponent() {
         onSelectChannel={handleSelectChannel}
         onGoToWelcome={goToWelcome}
         onStopWatching={stopWatching}
+        onVideosRemoved={handleVideosRemoved}
       />
     </div>
   );

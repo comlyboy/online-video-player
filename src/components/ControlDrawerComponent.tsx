@@ -25,6 +25,7 @@ interface ControlDrawerComponentProps {
   onSelectChannel: (channelUrl: string, channelName: string) => void;
   onGoToWelcome: () => void;
   onStopWatching: () => void;
+  onVideosRemoved: (removedVideoUrls: string[]) => void;
 }
 
 export function ControlDrawerComponent({
@@ -34,6 +35,7 @@ export function ControlDrawerComponent({
   onSelectChannel,
   onGoToWelcome,
   onStopWatching,
+  onVideosRemoved,
 }: ControlDrawerComponentProps) {
   const isOpen = useControlDrawerStore((state) => state.isOpen);
   const close = useControlDrawerStore((state) => state.close);
@@ -122,6 +124,7 @@ export function ControlDrawerComponent({
                   emptyMessage="Videos you play from a URL will show up here."
                   activeVideoUrl={activeVideoUrl}
                   onSelectVideoUrl={onReplayVideoUrl}
+                  onVideosRemoved={onVideosRemoved}
                 />
               </div>
             </div>
@@ -141,6 +144,7 @@ export function ControlDrawerComponent({
                   emptyMessage="Channels you play from a playlist will show up here."
                   activeVideoUrl={activeVideoUrl}
                   onSelectVideoUrl={onReplayVideoUrl}
+                  onVideosRemoved={onVideosRemoved}
                 />
               </div>
             </div>

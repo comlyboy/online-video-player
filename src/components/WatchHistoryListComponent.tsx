@@ -18,6 +18,7 @@ interface WatchHistoryListComponentProps {
   emptyMessage: string;
   activeVideoUrl: string;
   onSelectVideoUrl: (videoUrl: string) => void;
+  onVideosRemoved: (removedVideoUrls: string[]) => void;
 }
 
 export function WatchHistoryListComponent({
@@ -26,6 +27,7 @@ export function WatchHistoryListComponent({
   emptyMessage,
   activeVideoUrl,
   onSelectVideoUrl,
+  onVideosRemoved,
 }: WatchHistoryListComponentProps) {
   const allHistoryEntries = useWatchHistoryStore((state) => state.historyEntries);
   const historyEntries = allHistoryEntries.filter((entry) => (entry.source ?? WatchSource.VIDEO) === source);
@@ -36,6 +38,17 @@ export function WatchHistoryListComponent({
 
   const [expandedVideoUrl, setExpandedVideoUrl] = useState<string | null>(null);
 
+  async function removeEntry(videoUrl: string) {
+    await removeVideo(videoUrl);
+    onVideosRemoved([videoUrl]);
+  }
+
+  async function clearEntries() {
+    const removedVideoUrls = historyEntries.map((entry) => entry.videoUrl);
+    await clearHistory(source);
+    onVideosRemoved(removedVideoUrls);
+  }
+
   function toggleEntry(videoUrl: string) {
     setExpandedVideoUrl(expandedVideoUrl === videoUrl ? null : videoUrl);
   }
@@ -44,7 +57,7 @@ export function WatchHistoryListComponent({
     historyEntries.length > 0 ? (
       <button
         type="button"
-        onClick={() => clearHistory(source)}
+        onClick={() => void clearEntries()}
         className="text-xs text-foreground-muted transition hover:text-accent"
       >
         Clear
@@ -100,7 +113,7 @@ export function WatchHistoryListComponent({
                   )}
                   <button
                     type="button"
-                    onClick={() => removeVideo(entry.videoUrl)}
+                    onClick={() => void removeEntry(entry.videoUrl)}
                     aria-label="Remove from history"
                     className="flex h-7 w-7 shrink-0 items-center justify-center text-foreground-muted transition hover:text-red-400"
                   >
