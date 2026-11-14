@@ -58,7 +58,7 @@ export function ControlDrawerComponent({
       <div
         onClick={close}
         aria-hidden="true"
-        className={`fixed inset-0 z-[2147483646] bg-black/60 transition-opacity ${
+        className={`fixed inset-0 z-2147483646 bg-black/60 transition-opacity ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
@@ -68,7 +68,7 @@ export function ControlDrawerComponent({
         role="dialog"
         aria-modal="true"
         aria-label="Controls"
-        className={`fixed right-0 top-0 z-[2147483647] flex h-full w-full max-w-md flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-2147483647 flex h-full w-full max-w-md flex-col border-l border-border-default bg-background-elevated shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

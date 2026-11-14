@@ -1,11 +1,11 @@
 "use client";
 
 import Artplayer from "artplayer";
-import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
 
 import { cacheVideoForReuse, getCachedVideoBlob } from "@/database";
-import { isHlsUrl } from "@/lib/video-url";
+import { detectStreamFormat, StreamFormat } from "@/lib/stream-format";
+import { attachStream, StreamAttachment } from "@/lib/stream-players";
 import { buildPlaceholderPosterDataUrl } from "@/lib/video-placeholder";
 
 const FALLBACK_ACCENT_COLOR = "#d6922e";
@@ -22,6 +22,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const artplayerInstanceRef = useRef<Artplayer | null>(null);
   const [hasPlaybackError, setHasPlaybackError] = useState(false);
+  const [isStreamPlayback, setIsStreamPlayback] = useState(false);
 
   useEffect(() => {
     if (!playerContainerRef.current) {
@@ -32,11 +33,13 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
     let artplayerInstance: Artplayer | null = null;
     let cachedObjectUrl: string | null = null;
 
-    const isHlsStream = isHlsUrl(videoUrl);
-
     async function setUpPlayer() {
+      const streamFormat = await detectStreamFormat(videoUrl);
+      const isStream = streamFormat !== StreamFormat.NATIVE;
+      setIsStreamPlayback(isStream);
+
       // Streams are never cached: playlists are tiny and live channels have no end.
-      const cachedVideoBlob = isHlsStream ? null : await getCachedVideoBlob(videoUrl);
+      const cachedVideoBlob = isStream ? null : await getCachedVideoBlob(videoUrl);
 
       if (isCancelled || !playerContainerRef.current) {
         return;
@@ -49,25 +52,27 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
         playbackUrl = cachedObjectUrl;
       }
 
-      // Plays an HLS stream through hls.js, or natively where the browser supports it (Safari).
-      function playHlsStream(videoElement: HTMLVideoElement, streamUrl: string, player: Artplayer) {
-        if (Hls.isSupported()) {
-          const hlsInstance = new Hls();
-          hlsInstance.loadSource(streamUrl);
-          hlsInstance.attachMedia(videoElement);
-          hlsInstance.on(Hls.Events.ERROR, (_event, errorData) => {
-            if (errorData.fatal) {
-              // Expected for dead or blocked channels; the error panel tells the user, so avoid the dev error overlay.
-              console.warn("HLS stream failed:", errorData.details);
-              setHasPlaybackError(true);
-            }
-          });
-          player.on("destroy", () => hlsInstance.destroy());
-        } else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
-          videoElement.src = streamUrl;
-        } else {
+      // Plays HLS, DASH, FLV or MPEG-TS through the matching library (ArtPlayer only plays plain files by itself).
+      function playStream(videoElement: HTMLVideoElement, streamUrl: string, player: Artplayer) {
+        let streamAttachment: StreamAttachment | null = null;
+        let isPlayerDestroyed = false;
+
+        player.on("destroy", () => {
+          isPlayerDestroyed = true;
+          streamAttachment?.destroy();
+        });
+
+        void attachStream(streamFormat, videoElement, streamUrl, (reason) => {
+          // Expected for dead or blocked streams; the error panel tells the user, so avoid the dev error overlay.
+          console.warn(`${streamFormat} stream failed:`, reason);
           setHasPlaybackError(true);
-        }
+        }).then((attachment) => {
+          if (isPlayerDestroyed) {
+            attachment?.destroy();
+          } else {
+            streamAttachment = attachment;
+          }
+        });
       }
 
       // Screenshots need a CORS-enabled video (otherwise the canvas is tainted). Cached blobs are same-origin.
@@ -85,8 +90,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           autoSize: false,
           autoMini: true,
           // Only offer the button when the canvas can be exported; otherwise ArtPlayer rejects with a SecurityError.
-          // HLS plays through MSE blobs, which are same-origin, so it is always exportable.
-          screenshot: shouldRequestCors || Boolean(cachedObjectUrl) || isHlsStream,
+          // Streams play through MSE blobs, which are same-origin, so they are always exportable.
+          screenshot: shouldRequestCors || Boolean(cachedObjectUrl) || isStream,
           setting: true,
           loop: false,
           flip: true,
@@ -102,8 +107,8 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
           autoPlayback: true,
           airplay: true,
           theme: readAccentColor(),
-          ...(isHlsStream ? { type: "m3u8", customType: { m3u8: playHlsStream } } : {}),
-          moreVideoAttr: shouldRequestCors && !isHlsStream ? { crossOrigin: "anonymous" } : {},
+          ...(isStream ? { type: "stream", customType: { stream: playStream } } : {}),
+          moreVideoAttr: shouldRequestCors && !isStream ? { crossOrigin: "anonymous" } : {},
         });
 
         player.on("video:error", (error) => {
@@ -133,7 +138,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
       }
 
       try {
-        artplayerInstance = createPlayer(!cachedObjectUrl && !isHlsStream);
+        artplayerInstance = createPlayer(!cachedObjectUrl && !isStream);
       } catch (error) {
         console.error("ArtPlayer failed to initialise:", error);
         setHasPlaybackError(true);
@@ -141,7 +146,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
 
       artplayerInstanceRef.current = artplayerInstance;
 
-      if (!cachedVideoBlob && !isHlsStream) {
+      if (!cachedVideoBlob && !isStream) {
         void cacheVideoForReuse(videoUrl);
       }
     }
@@ -193,10 +198,10 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
             <circle cx="12" cy="16" r="0.5" fill="currentColor" />
           </svg>
           <p className="text-sm font-semibold text-foreground">
-            {isHlsUrl(videoUrl) ? "This channel is not available" : "This video could not be loaded"}
+            {isStreamPlayback ? "This channel is not available" : "This video could not be loaded"}
           </p>
           <p className="max-w-xs text-xs leading-relaxed text-foreground-muted">
-            {isHlsUrl(videoUrl)
+            {isStreamPlayback
               ? "It may be offline, blocked in your region, or it does not allow browsers to play it. Pick another channel from the playlist."
               : "Check that the URL points directly to a video file and is publicly accessible, then try again."}
           </p>

@@ -1,4 +1,4 @@
-import { isHlsUrl } from "@/lib/video-url";
+import { isStreamUrl } from "@/lib/stream-format";
 import { VideoMetadata } from "@/types/video-metadata";
 
 const METADATA_TIMEOUT_MS = 10000;
@@ -26,8 +26,8 @@ function readFileName(parsedUrl: URL): string {
 // Reads duration and resolution by letting the browser load only the video's metadata.
 function readPlaybackMetadata(videoUrl: string): Promise<PlaybackMetadata> {
   return new Promise((resolve) => {
-    // A stream has no fixed duration, and most browsers cannot load one in a bare <video>.
-    if (isHlsUrl(videoUrl)) {
+    // A stream has no fixed duration, and a bare <video> cannot load most of them.
+    if (isStreamUrl(videoUrl)) {
       resolve({ durationSeconds: null, widthPixels: null, heightPixels: null });
       return;
     }
@@ -117,7 +117,7 @@ export function formatFileSize(sizeBytes: number): string {
 
 // For a stream, the size header describes the tiny playlist file, not the video, so it is never shown.
 function hasMeaningfulSize(metadata: VideoMetadata): boolean {
-  return metadata.sizeBytes !== null && !/\.m3u8?$/i.test(metadata.fileName);
+  return metadata.sizeBytes !== null && !/\.(m3u8?|mpd)$/i.test(metadata.fileName);
 }
 
 export interface VideoMetadataRow {

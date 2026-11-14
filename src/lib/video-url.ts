@@ -27,11 +27,6 @@ function readLowerCasePathname(candidateUrl: string): string {
   }
 }
 
-// HLS streams (.m3u8) need hls.js to play in most browsers.
-export function isHlsUrl(candidateUrl: string): boolean {
-  return readLowerCasePathname(candidateUrl).endsWith(".m3u8");
-}
-
 // A .m3u file is a list of channels, not a video.
 export function isPlaylistUrl(candidateUrl: string): boolean {
   return readLowerCasePathname(candidateUrl).endsWith(".m3u");
