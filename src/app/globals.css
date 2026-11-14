@@ -121,3 +121,9 @@ body {
   background-color: var(--color-accent);
   color: var(--color-bg);
 }
+
+/* ArtPlayer's play buttons default to white; --art-theme is kept in step with the colour scheme by the player. */
+.art-video-player .art-state .art-icon-state svg,
+.art-video-player .art-controls .art-control-playAndPause .art-icon svg {
+  fill: var(--art-theme);
+}
