@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { PlayIconComponent } from "@/components/icons/PlayIconComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
+import { BUILT_IN_PLAYLISTS } from "@/lib/built-in-playlists";
 import { PlaylistPickerComponent } from "@/components/PlaylistPickerComponent";
 import { PlaylistStatus, usePlaylistStore } from "@/store/playlist-store";
 
@@ -25,15 +26,26 @@ function readIsSecurePageOnServer(): boolean {
 }
 
 interface PlaylistBrowserComponentProps {
+  isTabActive: boolean;
   activeVideoUrl: string;
   onSelectChannel: (channelUrl: string, channelName: string) => void;
 }
 
-export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: PlaylistBrowserComponentProps) {
+export function PlaylistBrowserComponent({ isTabActive, activeVideoUrl, onSelectChannel }: PlaylistBrowserComponentProps) {
   const savedPlaylistCount = usePlaylistStore((state) => state.savedPlaylists.length);
   const channels = usePlaylistStore((state) => state.channels);
   const status = usePlaylistStore((state) => state.status);
   const errorMessage = usePlaylistStore((state) => state.errorMessage);
+
+  const selectPlaylist = usePlaylistStore((state) => state.selectPlaylist);
+
+  // The big channel list is only fetched once the Playlist tab is opened: the last used playlist, else the built-in one.
+  useEffect(() => {
+    if (isTabActive && status === PlaylistStatus.IDLE) {
+      const { activePlaylistUrl } = usePlaylistStore.getState();
+      void selectPlaylist(activePlaylistUrl || BUILT_IN_PLAYLISTS[0].url);
+    }
+  }, [isTabActive, status, selectPlaylist]);
 
   const [searchText, setSearchText] = useState("");
   const [selectedGroup, setSelectedGroup] = useState(ALL_GROUPS_VALUE);

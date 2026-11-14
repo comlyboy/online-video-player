@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { CloseIconComponent } from "@/components/icons/CloseIconComponent";
+import { BUILT_IN_PLAYLISTS, isBuiltInPlaylistUrl } from "@/lib/built-in-playlists";
 import { isPlayableVideoUrl } from "@/lib/video-url";
 import { usePlaylistStore } from "@/store/playlist-store";
 
@@ -12,6 +13,9 @@ export function PlaylistPickerComponent() {
   const addPlaylist = usePlaylistStore((state) => state.addPlaylist);
   const selectPlaylist = usePlaylistStore((state) => state.selectPlaylist);
   const removePlaylist = usePlaylistStore((state) => state.removePlaylist);
+
+  // Built-in playlists come first; a saved copy of one (from an older version) is not listed twice.
+  const listedPlaylists = [...BUILT_IN_PLAYLISTS, ...savedPlaylists.filter((playlist) => !isBuiltInPlaylistUrl(playlist.url))];
 
   const [playlistUrlInput, setPlaylistUrlInput] = useState("");
   const [validationError, setValidationError] = useState("");
@@ -35,9 +39,9 @@ export function PlaylistPickerComponent() {
 
   return (
     <div className="flex flex-col gap-3">
-      {savedPlaylists.length > 0 ? (
+      {listedPlaylists.length > 0 ? (
         <ul aria-label="Saved playlists" className="flex flex-wrap gap-1.5">
-          {savedPlaylists.map((playlist) => {
+          {listedPlaylists.map((playlist) => {
             const isActive = playlist.url === activePlaylistUrl;
 
             return (
@@ -56,14 +60,18 @@ export function PlaylistPickerComponent() {
                 >
                   {playlist.name}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => removePlaylist(playlist.url)}
-                  aria-label={`Remove playlist ${playlist.name}`}
-                  className="shrink-0 py-1 pl-0.5 pr-2.5 transition hover:text-red-400"
-                >
-                  <CloseIconComponent className="h-3 w-3" />
-                </button>
+                {isBuiltInPlaylistUrl(playlist.url) ? (
+                  <span className="pr-1.5" />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => removePlaylist(playlist.url)}
+                    aria-label={`Remove playlist ${playlist.name}`}
+                    className="shrink-0 py-1 pl-0.5 pr-2.5 transition hover:text-red-400"
+                  >
+                    <CloseIconComponent className="h-3 w-3" />
+                  </button>
+                )}
               </li>
             );
           })}

@@ -136,7 +136,9 @@ export function ControlDrawerComponent({
               hidden={activeSourceTab !== SourceTab.PLAYLIST}
             >
               <div className="flex flex-col gap-7">
-                <PlaylistBrowserComponent activeVideoUrl={activeVideoUrl} onSelectChannel={onSelectChannel} />
+                <PlaylistBrowserComponent
+                  isTabActive={activeSourceTab === SourceTab.PLAYLIST}
+                  activeVideoUrl={activeVideoUrl} onSelectChannel={onSelectChannel} />
 
                 <WatchHistoryListComponent
                   source={WatchSource.PLAYLIST}

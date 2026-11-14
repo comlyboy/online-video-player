@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { isBuiltInPlaylistUrl } from "@/lib/built-in-playlists";
 import { parseM3uPlaylist } from "@/lib/m3u-playlist";
 import { buildPlaylistName } from "@/lib/playlist-name";
 import { PlaylistChannel } from "@/types/playlist-channel";
@@ -87,7 +88,8 @@ export const usePlaylistStore = create<PlaylistStore>()(
         errorMessage: "",
 
         addPlaylist: async (playlistUrl) => {
-          const isAlreadySaved = get().savedPlaylists.some((playlist) => playlist.url === playlistUrl);
+          const isAlreadySaved =
+            isBuiltInPlaylistUrl(playlistUrl) || get().savedPlaylists.some((playlist) => playlist.url === playlistUrl);
           if (!isAlreadySaved) {
             set({ savedPlaylists: [...get().savedPlaylists, { url: playlistUrl, name: buildPlaylistName(playlistUrl) }] });
           }
