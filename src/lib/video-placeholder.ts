@@ -16,8 +16,6 @@ export function buildPlaceholderPosterDataUrl(lines: string[]): string {
   const svg = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">',
     '<rect width="960" height="540" fill="#16130e" />',
-    '<circle cx="480" cy="220" r="56" fill="none" stroke="#e8a33d" stroke-width="4" />',
-    '<path d="M465 195 L465 245 L505 220 Z" fill="#e8a33d" />',
     textLines,
     "</svg>",
   ].join("");
