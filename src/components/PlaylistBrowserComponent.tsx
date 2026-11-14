@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import { PlayIconComponent } from "@/components/icons/PlayIconComponent";
 import { DrawerSectionComponent } from "@/components/DrawerSectionComponent";
@@ -9,6 +9,20 @@ import { PlaylistStatus, usePlaylistStore } from "@/store/playlist-store";
 
 const CHANNELS_PER_PAGE = 100;
 const ALL_GROUPS_VALUE = "";
+
+// The protocol never changes while the page is open, so there is nothing to subscribe to.
+function subscribeToNothing() {
+  return () => {};
+}
+
+function readIsSecurePage(): boolean {
+  return window.location.protocol === "https:";
+}
+
+// The server render has no window, so it assumes "not secure"; the browser corrects it right after hydration.
+function readIsSecurePageOnServer(): boolean {
+  return false;
+}
 
 interface PlaylistBrowserComponentProps {
   activeVideoUrl: string;
@@ -26,10 +40,11 @@ export function PlaylistBrowserComponent({ activeVideoUrl, onSelectChannel }: Pl
   const [visibleChannelCount, setVisibleChannelCount] = useState(CHANNELS_PER_PAGE);
 
   // Browsers block plain http streams on an https page, so those channels can never play there.
-  const playableChannels = useMemo(() => {
-    const isSecurePage = window.location.protocol === "https:";
-    return isSecurePage ? channels.filter((channel) => channel.url.startsWith("https://")) : channels;
-  }, [channels]);
+  const isSecurePage = useSyncExternalStore(subscribeToNothing, readIsSecurePage, readIsSecurePageOnServer);
+  const playableChannels = useMemo(
+    () => (isSecurePage ? channels.filter((channel) => channel.url.startsWith("https://")) : channels),
+    [channels, isSecurePage],
+  );
   const hiddenChannelCount = channels.length - playableChannels.length;
 
   const groupNames = useMemo(() => {
