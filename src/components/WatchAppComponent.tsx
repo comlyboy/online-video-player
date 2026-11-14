@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { ControlDrawerComponent } from "@/components/ControlDrawerComponent";
 import { ControlDrawerTriggerComponent } from "@/components/ControlDrawerTriggerComponent";
+import { PlayerHeaderComponent } from "@/components/PlayerHeaderComponent";
 import { PlatformFrameComponent } from "@/components/PlatformFrameComponent";
 import { SourceBadgeComponent } from "@/components/SourceBadgeComponent";
 import { VideoPlayerErrorBoundaryComponent } from "@/components/VideoPlayerErrorBoundaryComponent";
@@ -83,7 +84,6 @@ export function WatchAppComponent() {
   }
 
   const activePlatform = customSites.find((platform) => platform.id === activeTabId);
-  const sourceLabel = activePlatform ? activePlatform.name.toUpperCase() : activeVideoUrl ? "CUSTOM URL" : "";
 
   return (
     <div className="relative flex h-full min-h-0 flex-1 flex-col">
@@ -93,16 +93,21 @@ export function WatchAppComponent() {
         ) : activePlatform ? (
           <PlatformFrameComponent key={activePlatform.id} platform={activePlatform} />
         ) : activeVideoUrl ? (
-          <VideoPlayerErrorBoundaryComponent key={activeVideoUrl}>
-            <VideoPlayerComponent videoUrl={activeVideoUrl} />
-          </VideoPlayerErrorBoundaryComponent>
+          <div className="flex h-full flex-col">
+            <PlayerHeaderComponent videoUrl={activeVideoUrl} />
+            <div className="min-h-0 flex-1">
+              <VideoPlayerErrorBoundaryComponent key={activeVideoUrl}>
+                <VideoPlayerComponent videoUrl={activeVideoUrl} />
+              </VideoPlayerErrorBoundaryComponent>
+            </div>
+          </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-background-elevated text-center text-foreground-muted">
             <p className="max-w-sm px-6">Paste a direct video URL below and press Play to start streaming here.</p>
           </div>
         )}
 
-        {sourceLabel ? <SourceBadgeComponent label={sourceLabel} /> : null}
+        {activePlatform ? <SourceBadgeComponent label={activePlatform.name.toUpperCase()} /> : null}
       </div>
 
       <ControlDrawerTriggerComponent />

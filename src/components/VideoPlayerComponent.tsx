@@ -183,11 +183,7 @@ export function VideoPlayerComponent({ videoUrl }: VideoPlayerComponentProps) {
 
   return (
     <div className="relative h-full w-full bg-black">
-      <div
-        className="h-4 w-full border-b border-border-default bg-[radial-gradient(circle,var(--color-border)_2.4px,transparent_2.8px)] bg-size-[20px_16px] bg-position-[10px_center]"
-        aria-hidden="true"
-      />
-      <div ref={playerContainerRef} className="h-[calc(100%-16px)] w-full" />
+      <div ref={playerContainerRef} className="h-full w-full" />
 
       {hasPlaybackError ? (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-background-elevated px-6 text-center">
