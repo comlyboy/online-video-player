@@ -1,7 +1,6 @@
 [build]
   # This repo now holds client/ and server/ side by side; base tells
   # Netlify which one it's building. publish stays relative to base.
-  base = "client"
   command = "npm run build"
   publish = "out"
 
