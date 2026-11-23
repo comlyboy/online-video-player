@@ -135,3 +135,9 @@ select:not(:disabled),
 summary {
   cursor: pointer;
 }
+
+/* Hide the Netlify badge iframe injected at the edge */
+#nl-badge-frame,
+#nl-hud-frame {
+  display: none !important;
+}
